@@ -18,17 +18,28 @@ export type Hoehenstufe =
   | 'subalpin'
   | 'obersubalpin';
 
-/** Ökologische Eigenschaften, die eine Zeigerpflanze über den Standort verrät. */
+/**
+ * Ökologische Eigenschaften (Zeigerwerte), die eine Zeigerpflanze über den
+ * Standort verrät. Abgeleitet aus der NaiS-Zeigerpflanzenliste (Anhang 2A,
+ * Spalte «Zeiger»).
+ */
 export type Standorteigenschaft =
+  // Säure-/Basenachse
   | 'sauer' // bodensaure Verhältnisse (Silikat, Rohhumus)
   | 'basisch' // basenreich / kalkreich
-  | 'neutral'
+  | 'neutral' // «mittlere» Standorte
+  // Feuchteachse
   | 'trocken'
   | 'frisch'
   | 'feucht'
   | 'nass'
+  | 'wechselfeucht' // wechselfeucht/wechseltrocken
+  | 'luftfeucht'
+  // Nährstoffe
   | 'naehrstoffreich'
-  | 'naehrstoffarm';
+  | 'naehrstoffarm'
+  // weitere Standortssignale
+  | 'waermeliebend'; // laurophyll / wärmeliebend, milde Winter
 
 /** Bereich von Höhenmetern, dem eine Höhenstufe zugeordnet ist. */
 export interface HoehenstufenBereich {
@@ -48,7 +59,11 @@ export interface Zeigerpflanze {
   nameLat: string;
   /** ökologische Aussage(n) der Pflanze */
   eigenschaften: Standorteigenschaft[];
-  /** kurze fachliche Erläuterung für die UI */
+  /** Höhenstufen, in denen die Art ihren Verbreitungsschwerpunkt hat */
+  hoehenstufen?: Hoehenstufe[];
+  /** true, wenn die Art (fast) nur in Nadelwäldern auftritt */
+  nurNadelwald?: boolean;
+  /** kurze fachliche Erläuterung für die UI (Region, Detailangaben) */
   hinweis?: string;
 }
 

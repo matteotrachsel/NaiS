@@ -51,17 +51,36 @@ npm run preview    # Build lokal testen
 > siehe dortige `README.md`. Ohne Modell funktionieren NaiS-Logik und manuelle
 > Pflanzenwahl trotzdem.
 
-## Datenbasis erweitern
+## Datenbasis
 
-Die NaiS-Datenbank ist rein datengetrieben und wächst ohne Logikänderung:
+Die forstliche Datenbasis stammt direkt aus dem NaiS-Ordner
+(`00_Mini_NaiS_vollstandig_2026.pdf`, Anhang 2A):
 
-- **Neue Zeigerpflanze:** Eintrag in `src/data/zeigerpflanzen.ts` (+ ggf.
-  `modelClasses.ts`, wenn das Modell die Art kennt).
-- **Neuer Standortstyp:** Eintrag in `src/data/standorttypen.ts` mit
-  `hoehenstufen` + `erforderlicheEigenschaften` + `baumarten`.
+- **272 Zeigerpflanzen** (`src/data/zeigerpflanzen.ts`) – vollständige
+  alphabetische NaiS-Zeigerpflanzenliste mit Höhenstufen und Zeigerwerten
+  (sauer/basisch, Feuchte, Nährstoffe …).
+- **37 Waldstandortstypen** (`src/data/standorttypen.ts`) – zonale Haupttypen
+  aller Höhenstufen plus wichtige azonale Typen, mit NaiS-Code, Höhenstufe,
+  Standortökologie und Baumarten (Bausteine in `src/data/baumarten.ts`).
+- **Höhenstufen** (`src/data/hoehenstufen.ts`).
+
+### Zeigerpflanzen neu generieren
+
+Die Zeigerpflanzen-Datei ist generiert. Quelle ist
+`scripts/zeigerpflanzen_quelle.tsv` (aus dem PDF extrahiert):
+
+```bash
+python scripts/gen_zeigerpflanzen.py
+```
+
+### Erweitern (ohne Logikänderung)
+
+- **Standortstyp:** Eintrag in `src/data/standorttypen.ts` mit `hoehenstufen`
+  + `erforderlicheEigenschaften` + `baumarten` (die übrigen ~80 NaiS-Typen
+  lassen sich nach gleichem Muster ergänzen).
+- **Zeigerpflanze:** `scripts/zeigerpflanzen_quelle.tsv` ergänzen + Skript
+  neu ausführen (+ ggf. `modelClasses.ts`, wenn das Modell die Art kennt).
 - **Feinere Höhenstufen:** Bereiche in `src/data/hoehenstufen.ts` ergänzen.
-
-Quelle für die Erweiterung: der NaiS-Ordner (`00_Mini_NaiS_vollstandig_2026.pdf`).
 
 ## Hinweis
 

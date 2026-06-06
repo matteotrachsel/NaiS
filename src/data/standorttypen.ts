@@ -1,72 +1,395 @@
 import type { Standortstyp } from '@/types/nais';
+import {
+  Arve,
+  Bergahorn,
+  Bergfoehre,
+  Bergulme,
+  Birke,
+  Buche,
+  Eibe,
+  Esche,
+  Fichte,
+  Flaumeiche,
+  Hagebuche,
+  Hopfenbuche,
+  Laerche,
+  Mehlbeere,
+  Schwarzerle,
+  Stieleiche,
+  Tanne,
+  Traubenkirsche,
+  Vogelbeere,
+  Waldfoehre,
+  Winterlinde,
+} from './baumarten';
 
 /**
- * NaiS-Waldstandortstypen.
+ * NaiS-Waldstandortstypen (Auswahl der zonalen Haupttypen + wichtiger
+ * azonaler Typen), abgeleitet aus den Kurzbeschreibungen des NaiS-Ordners
+ * (Anhang 2A, Kap. 10) sowie der Standortstyp-Übersicht.
+ * Quelle: 00_Mini_NaiS_vollstandig_2026.pdf.
  *
- * Die Zuordnung im naisService erfolgt über:
- *   1. Höhenstufe muss in `hoehenstufen` enthalten sein, UND
- *   2. alle `erforderlicheEigenschaften` müssen von der Zeigerpflanze
- *      abgedeckt sein.
+ * Zuordnungslogik (siehe naisService):
+ *   Höhenstufe ∈ `hoehenstufen`  UND
+ *   alle `erforderlicheEigenschaften` werden von der Zeigerpflanze abgedeckt.
  *
- * Die `naisCode`-Werte sind, wo angegeben, an die NaiS-Typologie angelehnt.
- * Erweiterbar: weitere Standortstypen aus dem NaiS-Ordner ergänzen.
+ * `erforderlicheEigenschaften` enthält bewusst nur die *unterscheidenden*
+ * Standortssignale (Säure-/Basen- und Feuchteachse), damit eine einzelne
+ * Zeigerpflanze als Eingabe genügt. `naisCode` ist die NaiS-Typnummer.
+ *
+ * Erweiterbar: weitere der ~120 NaiS-Typen nach gleichem Muster ergänzen.
  */
 export const STANDORTTYPEN: Standortstyp[] = [
+  // ───────────────────────── obersubalpine Stufe (Kap. 10.1 / 10.15) ─────────
   {
-    id: 'heidelbeer_tannen_fichtenwald',
-    name: 'Heidelbeer-Tannen-Fichtenwald',
-    naisCode: '57V',
-    hoehenstufen: ['hochmontan', 'subalpin'],
+    id: 'laerchen_arvenwald_alpenrose',
+    name: 'Lärchen-Arvenwald mit Alpenrose',
+    naisCode: '59',
+    hoehenstufen: ['obersubalpin'],
     erforderlicheEigenschaften: ['sauer'],
-    baumarten: [
-      { nameDe: 'Fichte', nameLat: 'Picea abies', eignung: 'hauptbaumart' },
-      { nameDe: 'Weisstanne', nameLat: 'Abies alba', eignung: 'hauptbaumart' },
-      { nameDe: 'Vogelbeere', nameLat: 'Sorbus aucuparia', eignung: 'pionier' },
-    ],
+    baumarten: [Arve('hauptbaumart'), Laerche('hauptbaumart'), Vogelbeere('pionier'), Birke('pionier')],
     beschreibung:
-      'Bodensaurer, hochmontaner Nadelwald mit Heidelbeere in der Krautschicht.',
+      'Larici-Pinetum cembrae. Arve dominiert, dazu Lärche; saure Silikat-/Blockstandorte der kontinentalen Hochalpen.',
   },
   {
-    id: 'ahorn_eschenwald',
-    name: 'Ahorn-Eschenwald (Schluchtwald-nah)',
-    naisCode: '26',
-    hoehenstufen: ['submontan', 'untermontan', 'obermontan'],
-    erforderlicheEigenschaften: ['basisch', 'feucht'],
-    baumarten: [
-      { nameDe: 'Esche', nameLat: 'Fraxinus excelsior', eignung: 'hauptbaumart' },
-      { nameDe: 'Bergahorn', nameLat: 'Acer pseudoplatanus', eignung: 'hauptbaumart' },
-      { nameDe: 'Bergulme', nameLat: 'Ulmus glabra', eignung: 'nebenbaumart' },
-    ],
-    beschreibung:
-      'Nährstoffreicher, feucht-frischer Edellaubholz-Standort auf basenreichem Boden.',
-  },
-  {
-    id: 'buchenwald_basisch',
-    name: 'Waldmeister-/Buchenwald',
-    naisCode: '8',
-    hoehenstufen: ['submontan', 'untermontan', 'obermontan'],
-    erforderlicheEigenschaften: ['basisch'],
-    baumarten: [
-      { nameDe: 'Buche', nameLat: 'Fagus sylvatica', eignung: 'hauptbaumart' },
-      { nameDe: 'Bergahorn', nameLat: 'Acer pseudoplatanus', eignung: 'nebenbaumart' },
-      { nameDe: 'Esche', nameLat: 'Fraxinus excelsior', eignung: 'nebenbaumart' },
-    ],
-    beschreibung:
-      'Basenreicher, frischer Buchenstandort der collinen bis obermontanen Stufe.',
+    id: 'laerchen_arvenwald_heidelbeere',
+    name: 'Lärchen-Arvenwald mit Heidelbeere',
+    naisCode: '59V',
+    hoehenstufen: ['obersubalpin'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Arve('hauptbaumart'), Laerche('hauptbaumart'), Bergfoehre('nebenbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Lockere Lärchen-Arvenwälder auf Silikatböden oder basenarmen Moränen.',
   },
   {
     id: 'alpenrosen_bergfoehrenwald',
     name: 'Alpenrosen-Bergföhrenwald',
-    naisCode: '60*',
+    naisCode: '70',
     hoehenstufen: ['subalpin', 'obersubalpin'],
     erforderlicheEigenschaften: ['sauer'],
-    baumarten: [
-      { nameDe: 'Bergföhre', nameLat: 'Pinus mugo / uncinata', eignung: 'hauptbaumart' },
-      { nameDe: 'Arve', nameLat: 'Pinus cembra', eignung: 'hauptbaumart' },
-      { nameDe: 'Fichte', nameLat: 'Picea abies', eignung: 'nebenbaumart' },
-      { nameDe: 'Lärche', nameLat: 'Larix decidua', eignung: 'nebenbaumart' },
-    ],
+    baumarten: [Bergfoehre('hauptbaumart'), Arve('nebenbaumart'), Fichte('nebenbaumart'), Laerche('nebenbaumart')],
     beschreibung:
-      'Saurer, schneereicher Hochlagen-Nadelwald mit Rostblättriger Alpenrose.',
+      'Saurer, schneereicher Hochlagen-Nadelwald mit Rostblättriger Alpenrose; Aufrechte Bergföhre.',
+  },
+  {
+    id: 'steinrosen_bergfoehrenwald',
+    name: 'Steinrosen-Bergföhrenwald',
+    naisCode: '69',
+    hoehenstufen: ['subalpin', 'obersubalpin'],
+    erforderlicheEigenschaften: ['basisch'],
+    baumarten: [Bergfoehre('hauptbaumart'), Fichte('nebenbaumart'), Laerche('nebenbaumart')],
+    beschreibung: 'Basenreicher Bergföhrenwald der Hochlagen (Steinröschen/Bewimperte Alpenrose).',
+  },
+
+  // ───────────────────────── subalpine Stufe (Kap. 10.2) ─────────────────────
+  {
+    id: 'alpenlattich_fichtenwald_heidelbeere',
+    name: 'Alpenlattich-Fichtenwald mit Heidelbeere',
+    naisCode: '57V',
+    hoehenstufen: ['subalpin'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Fichte('hauptbaumart'), Vogelbeere('pionier'), Laerche('nebenbaumart')],
+    beschreibung: 'Bodensaurer subalpiner Fichtenwald mit Heidelbeere und Alpenlattich.',
+  },
+  {
+    id: 'preiselbeer_fichtenwald',
+    name: 'Typischer Preiselbeer-Fichtenwald',
+    naisCode: '58',
+    hoehenstufen: ['subalpin'],
+    erforderlicheEigenschaften: ['sauer', 'trocken'],
+    baumarten: [Fichte('hauptbaumart'), Vogelbeere('pionier'), Laerche('nebenbaumart')],
+    beschreibung: 'Saurer, eher trockener subalpiner Fichtenwald (Preiselbeere, Wollreitgras).',
+  },
+  {
+    id: 'perlgras_fichtenwald',
+    name: 'Typischer Perlgras-Fichtenwald',
+    naisCode: '54',
+    hoehenstufen: ['subalpin'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Fichte('hauptbaumart'), Vogelbeere('pionier'), Laerche('nebenbaumart')],
+    beschreibung: 'Subalpiner Fichtenwald auf mittleren bis basischen Böden.',
+  },
+  {
+    id: 'zwergbuchs_fichtenwald',
+    name: 'Zwergbuchs-Fichtenwald',
+    naisCode: '53',
+    hoehenstufen: ['subalpin'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Fichte('hauptbaumart'), Bergfoehre('nebenbaumart'), Laerche('nebenbaumart')],
+    beschreibung: 'Basenreicher, trockener subalpiner Fichtenwald (Zwergbuchs, Erika).',
+  },
+
+  // ───────────────────────── hochmontane Stufe (Kap. 10.3 / 10.4) ────────────
+  {
+    id: 'heidelbeer_tannen_fichtenwald',
+    name: 'Typischer Heidelbeer-Tannen-Fichtenwald',
+    naisCode: '46',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Bodensaurer, hochmontaner Tannen-Fichtenwald mit Heidelbeere.',
+  },
+  {
+    id: 'wollreitgras_tannen_fichtenwald',
+    name: 'Typischer Wollreitgras-Tannen-Fichtenwald',
+    naisCode: '47',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Saurer hochmontaner Tannen-Fichtenwald mit Wollreitgras.',
+  },
+  {
+    id: 'schachtelhalm_tannen_fichtenwald',
+    name: 'Typischer Schachtelhalm-Tannen-Fichtenwald',
+    naisCode: '49',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['feucht'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Bergahorn('nebenbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Vernässter hochmontaner Tannen-Fichtenwald (Schachtelhalm); wechselnde Feuchtigkeit.',
+  },
+  {
+    id: 'hochstauden_tannen_fichtenwald',
+    name: 'Typischer Hochstauden-Tannen-Fichtenwald',
+    naisCode: '50',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['feucht', 'naehrstoffreich'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Bergahorn('nebenbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Sehr wüchsiger, nährstoff- und basenreicher Hochstaudenstandort.',
+  },
+  {
+    id: 'labkraut_tannen_fichtenwald',
+    name: 'Typischer Labkraut-Tannen-Fichtenwald',
+    naisCode: '51',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Bergahorn('nebenbaumart')],
+    beschreibung: 'Hochmontaner Tannen-Fichtenwald auf mittleren Böden.',
+  },
+  {
+    id: 'karbonat_tannen_fichtenwald_weissegge',
+    name: 'Karbonat-Tannen-Fichtenwald mit Weissegge',
+    naisCode: '52',
+    hoehenstufen: ['hochmontan'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Tanne('hauptbaumart'), Fichte('hauptbaumart'), Buche('nebenbaumart')],
+    beschreibung: 'Basenreicher, eher trockener hochmontaner Tannen-Fichtenwald auf Karbonat.',
+  },
+  {
+    id: 'hochstauden_fichtenwald',
+    name: 'Typischer Hochstauden-Fichtenwald',
+    naisCode: '60',
+    hoehenstufen: ['hochmontan', 'subalpin'],
+    erforderlicheEigenschaften: ['feucht', 'naehrstoffreich'],
+    baumarten: [Fichte('hauptbaumart'), Bergahorn('nebenbaumart'), Vogelbeere('pionier'), Laerche('pionier')],
+    beschreibung: 'Hochstauden-Fichtenwald an kühl-feuchten, nährstoffreichen Lagen.',
+  },
+
+  // ───────────── Laubwälder der hochmontanen/subalpinen Stufe (Kap. 10.5) ─────
+  {
+    id: 'ahorn_buchenwald',
+    name: 'Ahorn-Buchenwald',
+    naisCode: '21',
+    hoehenstufen: ['obermontan', 'hochmontan'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Buche('hauptbaumart'), Bergahorn('hauptbaumart'), Tanne('nebenbaumart'), Fichte('nebenbaumart'), Vogelbeere('pionier')],
+    beschreibung: 'Buchen-Bergahornwald der oberen Lagen, oft an kühlen Hängen.',
+  },
+
+  // ───────────────────────── obermontane Stufe (Kap. 10.6 / 10.7) ────────────
+  {
+    id: 'waldschwingel_tannen_buchenwald',
+    name: 'Waldschwingel-Tannen-Buchenwald',
+    naisCode: '18',
+    hoehenstufen: ['obermontan'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Tanne('hauptbaumart'), Buche('hauptbaumart'), Fichte('nebenbaumart'), Bergahorn('nebenbaumart')],
+    beschreibung: 'Zonaler obermontaner Tannen-Buchenwald auf mittleren Böden.',
+  },
+  {
+    id: 'waldsimsen_tannen_buchenwald',
+    name: 'Typischer Waldsimsen-Tannen-Buchenwald',
+    naisCode: '19',
+    hoehenstufen: ['obermontan'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Tanne('hauptbaumart'), Buche('hauptbaumart'), Fichte('nebenbaumart')],
+    beschreibung: 'Bodensaurer obermontaner Tannen-Buchenwald (Waldsimse).',
+  },
+  {
+    id: 'karbonat_tannen_buchenwald',
+    name: 'Typischer Karbonat-Tannen-Buchenwald',
+    naisCode: '18M',
+    hoehenstufen: ['obermontan'],
+    erforderlicheEigenschaften: ['basisch'],
+    baumarten: [Tanne('hauptbaumart'), Buche('hauptbaumart'), Bergahorn('nebenbaumart'), Esche('nebenbaumart')],
+    beschreibung: 'Basenreicher obermontaner Tannen-Buchenwald auf Karbonat.',
+  },
+  {
+    id: 'hochstauden_tannen_buchenwald',
+    name: 'Hochstauden-Tannen-Buchenwald',
+    naisCode: '20',
+    hoehenstufen: ['obermontan'],
+    erforderlicheEigenschaften: ['feucht', 'naehrstoffreich'],
+    baumarten: [Tanne('hauptbaumart'), Buche('hauptbaumart'), Bergahorn('nebenbaumart'), Esche('nebenbaumart')],
+    beschreibung: 'Sehr wüchsiger, nährstoffreicher Tannen-Buchenwald (Hochstauden).',
+  },
+  {
+    id: 'ahorn_eschenwald_hoehe',
+    name: 'Ahorn-Eschenwald (Höhenausbildung)',
+    naisCode: '26h',
+    hoehenstufen: ['obermontan'],
+    erforderlicheEigenschaften: ['basisch', 'feucht'],
+    baumarten: [Esche('hauptbaumart'), Bergahorn('hauptbaumart'), Bergulme('nebenbaumart')],
+    beschreibung: 'Nährstoff-/basenreicher Edellaubholzstandort der oberen Lagen (Schlucht-/Hangfuss).',
+  },
+
+  // ────────────── Tannen-/Buchenwälder der untermontanen Stufe (10.8/10.9) ───
+  {
+    id: 'hainsimsen_buchenwald',
+    name: 'Typischer Hainsimsen-Buchenwald',
+    naisCode: '1',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Buche('hauptbaumart'), Tanne('nebenbaumart'), Stieleiche('nebenbaumart')],
+    beschreibung: 'Bodensaurer, zonaler Buchenwald der unteren Lagen (Hainsimse).',
+  },
+  {
+    id: 'waldmeister_buchenwald',
+    name: 'Typischer Waldmeister-Buchenwald',
+    naisCode: '7a',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Buche('hauptbaumart'), Bergahorn('nebenbaumart'), Esche('nebenbaumart'), Tanne('nebenbaumart')],
+    beschreibung: 'Zonaler Buchenwald auf mittleren, frischen Böden (Waldmeister).',
+  },
+  {
+    id: 'lungenkraut_platterbsen_buchenwald',
+    name: 'Typischer Lungenkraut-/Platterbsen-Buchenwald',
+    naisCode: '9a',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['basisch'],
+    baumarten: [Buche('hauptbaumart'), Bergahorn('nebenbaumart'), Esche('nebenbaumart')],
+    beschreibung: 'Basenreicher, frischer Buchenwald (Lungenkraut, Platterbse).',
+  },
+  {
+    id: 'bingelkraut_zahnwurz_buchenwald',
+    name: 'Typischer Bingelkraut-/Zahnwurz-Buchenwald',
+    naisCode: '12a',
+    hoehenstufen: ['submontan', 'untermontan', 'obermontan'],
+    erforderlicheEigenschaften: ['basisch'],
+    baumarten: [Buche('hauptbaumart'), Bergahorn('nebenbaumart'), Esche('nebenbaumart'), Tanne('nebenbaumart')],
+    beschreibung: 'Basenreicher Buchenwald (Bingelkraut, Zahnwurz) auf Mull/Rendzina.',
+  },
+  {
+    id: 'seggen_buchenwald_weissegge',
+    name: 'Seggen-Buchenwald mit Weissegge',
+    naisCode: '14',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Buche('hauptbaumart'), Waldfoehre('nebenbaumart'), Mehlbeere('nebenbaumart'), Eibe('nebenbaumart')],
+    beschreibung: 'Trockener, basenreicher Buchenwald auf flachgründigem Kalk (Weissegge).',
+  },
+
+  // ──────────────── Buchen-/Edellaub der submontanen Stufe (Kap. 10.10/10.11) ─
+  {
+    id: 'aronstab_buchenwald',
+    name: 'Aronstab-Buchenwald',
+    naisCode: '11',
+    hoehenstufen: ['collin', 'submontan'],
+    erforderlicheEigenschaften: ['basisch', 'feucht'],
+    baumarten: [Buche('hauptbaumart'), Esche('nebenbaumart'), Bergahorn('nebenbaumart'), Winterlinde('nebenbaumart')],
+    beschreibung: 'Nährstoffreicher, frisch-feuchter Buchenwald (Aronstab) tiefer Lagen.',
+  },
+  {
+    id: 'ahorn_eschenwald',
+    name: 'Ahorn-Eschenwald',
+    naisCode: '26',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['basisch', 'feucht'],
+    baumarten: [Esche('hauptbaumart'), Bergahorn('hauptbaumart'), Bergulme('nebenbaumart'), Winterlinde('nebenbaumart')],
+    beschreibung: 'Nährstoff-/basenreicher, feucht-frischer Edellaubholzstandort (Schluchtwald-nah).',
+  },
+  {
+    id: 'bach_eschenwald',
+    name: 'Bach-Eschenwald',
+    naisCode: '27',
+    hoehenstufen: ['submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['feucht'],
+    baumarten: [Esche('hauptbaumart'), Bergahorn('nebenbaumart'), Schwarzerle('nebenbaumart'), Traubenkirsche('pionier')],
+    beschreibung: 'Feucht-nasser Eschenwald entlang von Bächen und in Mulden.',
+  },
+  {
+    id: 'traubenkirschen_eschenwald',
+    name: 'Traubenkirschen-Eschenwald',
+    naisCode: '30',
+    hoehenstufen: ['collin', 'submontan'],
+    erforderlicheEigenschaften: ['nass'],
+    baumarten: [Esche('hauptbaumart'), Traubenkirsche('nebenbaumart'), Schwarzerle('nebenbaumart'), Bergulme('nebenbaumart')],
+    beschreibung: 'Nasser Auen-naher Eschen-Mischwald der Tieflagen.',
+  },
+
+  // ───────────────────── Laubwälder der collinen Stufe (Kap. 10.12) ──────────
+  {
+    id: 'waldlabkraut_hagebuchenmischwald',
+    name: 'Waldlabkraut-Hagebuchenmischwald',
+    naisCode: '35',
+    hoehenstufen: ['collin', 'submontan'],
+    erforderlicheEigenschaften: ['neutral'],
+    baumarten: [Hagebuche('hauptbaumart'), Stieleiche('hauptbaumart'), Winterlinde('nebenbaumart'), Buche('nebenbaumart')],
+    beschreibung: 'Collin-submontaner Eichen-Hagebuchenmischwald mittlerer Standorte.',
+  },
+  {
+    id: 'platterbsen_eichenmischwald',
+    name: 'Platterbsen-Eichenmischwald',
+    naisCode: '41',
+    hoehenstufen: ['collin', 'submontan'],
+    erforderlicheEigenschaften: ['sauer'],
+    baumarten: [Stieleiche('hauptbaumart'), Hagebuche('nebenbaumart'), Birke('pionier')],
+    beschreibung: 'Eher saurer, wechseltrockener Eichenmischwald der Tieflagen.',
+  },
+  {
+    id: 'turmkressen_flaumeichenwald',
+    name: 'Turmkressen-Flaumeichenwald',
+    naisCode: '38',
+    hoehenstufen: ['collin', 'submontan'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Flaumeiche('hauptbaumart'), Hopfenbuche('nebenbaumart'), Waldfoehre('nebenbaumart')],
+    beschreibung: 'Trockenwarmer, basenreicher Flaumeichenwald (Felshänge, Südlagen).',
+  },
+
+  // ───────────────────── Föhrenwälder, azonal (Kap. 10.14 / 10.15) ───────────
+  {
+    id: 'pfeifengras_foehrenwald',
+    name: 'Pfeifengras-Föhrenwald',
+    naisCode: '61',
+    hoehenstufen: ['collin', 'submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['wechselfeucht'],
+    baumarten: [Waldfoehre('hauptbaumart'), Stieleiche('nebenbaumart'), Birke('pionier')],
+    beschreibung: 'Azonaler Föhrenwald auf wechselfeuchten, oft tonigen Böden.',
+  },
+  {
+    id: 'orchideen_foehrenwald',
+    name: 'Orchideen-Föhrenwald',
+    naisCode: '62',
+    hoehenstufen: ['collin', 'submontan', 'untermontan'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Waldfoehre('hauptbaumart'), Flaumeiche('nebenbaumart'), Mehlbeere('nebenbaumart')],
+    beschreibung: 'Trockener, basenreicher Föhrenwald mit Orchideen auf Kalk.',
+  },
+  {
+    id: 'erika_foehrenwald',
+    name: 'Erika-/Strauchwicken-Föhrenwald',
+    naisCode: '65',
+    hoehenstufen: ['collin', 'submontan', 'untermontan', 'obermontan'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Waldfoehre('hauptbaumart'), Mehlbeere('nebenbaumart'), Buche('nebenbaumart')],
+    beschreibung: 'Trockener Kalk-Föhrenwald (Erika, Strauchwicke) auf Xero-Kalkmull.',
+  },
+  {
+    id: 'erika_bergfoehrenwald',
+    name: 'Erika-Bergföhrenwald',
+    naisCode: '67',
+    hoehenstufen: ['hochmontan', 'subalpin'],
+    erforderlicheEigenschaften: ['basisch', 'trocken'],
+    baumarten: [Bergfoehre('hauptbaumart'), Fichte('nebenbaumart'), Waldfoehre('nebenbaumart')],
+    beschreibung: 'Trockener, basenreicher Bergföhrenwald der höheren Lagen (Erika).',
   },
 ];

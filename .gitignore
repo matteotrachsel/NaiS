@@ -8,3 +8,8 @@ dist-ssr
 
 # grosse Originaldaten
 *.pdf
+
+# PDF-Textextraktion (regenerierbar; _zeiger.tsv bleibt als Generator-Input versioniert)
+_pdf_text.txt
+
+.vercel
