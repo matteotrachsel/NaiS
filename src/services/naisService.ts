@@ -1,0 +1,108 @@
+import type {
+  AuswertungErgebnis,
+  AuswertungInput,
+  BaumartEmpfehlung,
+  HoehenstufenBereich,
+  Standortstyp,
+} from '@/types/nais';
+import { HOEHENSTUFEN } from '@/data/hoehenstufen';
+import { ZEIGERPFLANZEN_BY_ID } from '@/data/zeigerpflanzen';
+import { STANDORTTYPEN } from '@/data/standorttypen';
+
+/**
+ * Ordnet eine Höhe (m ü. M.) der passenden Höhenstufe zu.
+ * Wirft, wenn keine Stufe definiert ist (sollte durch offenen Endbereich
+ * nie passieren), und clamped negative Höhen auf 0.
+ */
+export function getHoehenstufe(hoeheM: number): HoehenstufenBereich {
+  const h = Math.max(0, hoeheM);
+  const treffer = HOEHENSTUFEN.find(
+    (b) => h >= b.minM && (b.maxM === null || h < b.maxM),
+  );
+  if (!treffer) {
+    throw new Error(`Keine Höhenstufe für ${hoeheM} m ü. M. definiert.`);
+  }
+  return treffer;
+}
+
+/** Dedupliziert Baumarten (nach lat. Namen) und sortiert nach Eignung. */
+function aggregiereBaumarten(standorte: Standortstyp[]): BaumartEmpfehlung[] {
+  const rang: Record<BaumartEmpfehlung['eignung'], number> = {
+    hauptbaumart: 0,
+    nebenbaumart: 1,
+    pionier: 2,
+  };
+  const byKey = new Map<string, BaumartEmpfehlung>();
+  for (const s of standorte) {
+    for (const b of s.baumarten) {
+      const vorhanden = byKey.get(b.nameLat);
+      // Beste (niedrigste) Eignungsstufe gewinnt.
+      if (!vorhanden || rang[b.eignung] < rang[vorhanden.eignung]) {
+        byKey.set(b.nameLat, b);
+      }
+    }
+  }
+  return [...byKey.values()].sort((a, b) => rang[a.eignung] - rang[b.eignung]);
+}
+
+/**
+ * Kernfunktion: nimmt Pflanzen-ID + Höhe, führt das NaiS-Mapping durch und
+ * liefert Standortstyp(en) sowie eine aggregierte Baumarten-Empfehlung.
+ */
+export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErgebnis {
+  const pflanze = ZEIGERPFLANZEN_BY_ID[pflanzenId];
+  if (!pflanze) {
+    throw new Error(`Unbekannte Zeigerpflanze: "${pflanzenId}".`);
+  }
+
+  const hoehenstufe = getHoehenstufe(hoeheM);
+  const hinweise: string[] = [];
+  const pflanzenEigenschaften = new Set(pflanze.eigenschaften);
+
+  // Kandidaten: Höhenstufe passt UND alle erforderlichen Eigenschaften
+  // werden von der Zeigerpflanze abgedeckt.
+  let standorte = STANDORTTYPEN.filter(
+    (s) =>
+      s.hoehenstufen.includes(hoehenstufe.stufe) &&
+      s.erforderlicheEigenschaften.every((e) => pflanzenEigenschaften.has(e)),
+  );
+
+  let unsicher = false;
+
+  if (standorte.length === 0) {
+    unsicher = true;
+    // Fallback 1: gleiche Eigenschaften, aber Höhenstufe passt nicht exakt.
+    const nachEigenschaft = STANDORTTYPEN.filter((s) =>
+      s.erforderlicheEigenschaften.every((e) => pflanzenEigenschaften.has(e)),
+    );
+    if (nachEigenschaft.length > 0) {
+      standorte = nachEigenschaft;
+      hinweise.push(
+        `Keine exakte Übereinstimmung für die Höhenstufe „${hoehenstufe.label}". ` +
+          `Angezeigt werden Standorte mit passender Bodenökologie – Höhe bitte prüfen.`,
+      );
+    } else {
+      hinweise.push(
+        `Für „${pflanze.nameDe}" auf der Stufe „${hoehenstufe.label}" ist noch ` +
+          `kein Standortstyp hinterlegt. Datenbasis erweitern oder Aufnahme manuell prüfen.`,
+      );
+    }
+  }
+
+  if (standorte.length > 1) {
+    hinweise.push(
+      'Mehrere Standortstypen kommen in Frage – endgültige Wahl im Feld anhand ' +
+        'weiterer Zeigerarten und Bodenmerkmalen treffen.',
+    );
+  }
+
+  return {
+    pflanze,
+    hoeheM,
+    hoehenstufe,
+    standorte,
+    empfohleneBaumarten: aggregiereBaumarten(standorte),
+    unsicher,
+    hinweise,
+  };
+}

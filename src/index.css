@@ -1,0 +1,252 @@
+:root {
+  --gruen: #1b4332;
+  --gruen-hell: #2d6a4f;
+  --akzent: #95d5b2;
+  --warn: #e9c46a;
+  --fehler: #d62828;
+  --bg: #f1f5f2;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #5a6b62;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  margin: 0 -1rem 1rem;
+  background: var(--gruen);
+  color: #fff;
+}
+
+.topbar h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.15);
+}
+.status-pill.offline {
+  background: var(--warn);
+  color: #3a2f00;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: var(--gruen-hell);
+}
+
+.card h3 {
+  font-size: 0.9rem;
+  margin: 1rem 0 0.4rem;
+  color: var(--gruen);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--gruen-hell);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.btn-secondary {
+  background: var(--akzent);
+  color: var(--gruen);
+  font-weight: 600;
+}
+
+select,
+input[type='number'] {
+  font: inherit;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #cdd8d1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.hoehe-zeile {
+  display: flex;
+  gap: 0.6rem;
+  align-items: stretch;
+}
+.hoehe-zeile .btn-secondary {
+  white-space: nowrap;
+}
+.hoehe-feld {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+.hoehe-feld span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.vorschau {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 0.8rem;
+}
+
+.vorhersagen {
+  list-style: none;
+  padding: 0;
+  margin: 0.8rem 0 0;
+}
+.vorhersagen li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.45rem 0.2rem;
+  border-bottom: 1px solid #eef2ef;
+}
+.konfidenz {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.meta {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+}
+.meta > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.meta dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.meta dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+.standorte,
+.baumarten {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.standorte li {
+  padding: 0.5rem 0;
+}
+.standorte p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.baumart {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  border-radius: 9px;
+  margin-bottom: 0.4rem;
+  background: #f3f8f4;
+}
+.baumart--hauptbaumart {
+  background: var(--akzent);
+}
+.baumart-eignung {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--gruen);
+}
+
+.ergebnis--unsicher {
+  border: 1px solid var(--warn);
+}
+
+.hinweis {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.5rem 0 0;
+}
+.fehler {
+  color: var(--fehler);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+.disclaimer {
+  margin-top: 1rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.modell-status {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 1.5rem;
+}
