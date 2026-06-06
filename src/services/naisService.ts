@@ -61,10 +61,15 @@ export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErg
 
   // Kandidaten: Höhenstufe passt UND alle erforderlichen Eigenschaften
   // werden von der Zeigerpflanze abgedeckt.
+  // Sortierung nach Spezifität: Standorte mit mehr (passenden) geforderten
+  // Eigenschaften zuerst – azonale Typen ohne Bodensignal landen hinten.
   let standorte = STANDORTTYPEN.filter(
     (s) =>
       s.hoehenstufen.includes(hoehenstufe.stufe) &&
       s.erforderlicheEigenschaften.every((e) => pflanzenEigenschaften.has(e)),
+  ).sort(
+    (a, b) =>
+      b.erforderlicheEigenschaften.length - a.erforderlicheEigenschaften.length,
   );
 
   let unsicher = false;

@@ -40,3 +40,6 @@ export const Gruenerle = art('Grünerle', 'Alnus viridis');
 export const Weisserle = art('Weisserle', 'Alnus incana');
 export const Schwarzerle = art('Schwarzerle', 'Alnus glutinosa');
 export const Eibe = art('Eibe', 'Taxus baccata');
+export const Robinie = art('Robinie', 'Robinia pseudoacacia');
+export const Spitzahorn = art('Spitzahorn', 'Acer platanoides');
+export const Sandbirke = art('Birke', 'Betula pubescens');

@@ -59,25 +59,25 @@ Die forstliche Datenbasis stammt direkt aus dem NaiS-Ordner
 - **272 Zeigerpflanzen** (`src/data/zeigerpflanzen.ts`) – vollständige
   alphabetische NaiS-Zeigerpflanzenliste mit Höhenstufen und Zeigerwerten
   (sauer/basisch, Feuchte, Nährstoffe …).
-- **37 Waldstandortstypen** (`src/data/standorttypen.ts`) – zonale Haupttypen
-  aller Höhenstufen plus wichtige azonale Typen, mit NaiS-Code, Höhenstufe,
+- **143 Waldstandortstypen** (`src/data/standorttypen.ts`) – der vollständige
+  NaiS-Katalog (Kap. 10), mit NaiS-Code, Höhenstufe (aus der Kapitelgruppe),
   Standortökologie und Baumarten (Bausteine in `src/data/baumarten.ts`).
 - **Höhenstufen** (`src/data/hoehenstufen.ts`).
 
-### Zeigerpflanzen neu generieren
+### Daten neu generieren
 
-Die Zeigerpflanzen-Datei ist generiert. Quelle ist
-`scripts/zeigerpflanzen_quelle.tsv` (aus dem PDF extrahiert):
+Zeigerpflanzen und Standortstypen sind aus dem PDF generiert (Quelldaten in
+`scripts/*_quelle.*`):
 
 ```bash
-python scripts/gen_zeigerpflanzen.py
+python scripts/gen_zeigerpflanzen.py    # -> src/data/zeigerpflanzen.ts
+python scripts/gen_standorttypen.py     # -> src/data/standorttypen.ts
 ```
 
-### Erweitern (ohne Logikänderung)
+### Erweitern / nachschärfen (ohne Logikänderung)
 
-- **Standortstyp:** Eintrag in `src/data/standorttypen.ts` mit `hoehenstufen`
-  + `erforderlicheEigenschaften` + `baumarten` (die übrigen ~80 NaiS-Typen
-  lassen sich nach gleichem Muster ergänzen).
+- **Standortstyp-Feinheiten:** einzelne Einträge in `src/data/standorttypen.ts`
+  nachschärfen (z. B. Baumarten/Ökologie) oder die Regeln im Generator anpassen.
 - **Zeigerpflanze:** `scripts/zeigerpflanzen_quelle.tsv` ergänzen + Skript
   neu ausführen (+ ggf. `modelClasses.ts`, wenn das Modell die Art kennt).
 - **Feinere Höhenstufen:** Bereiche in `src/data/hoehenstufen.ts` ergänzen.
