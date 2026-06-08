@@ -13,8 +13,14 @@ interface Props {
 /**
  * Höhen-Eingabe: GPS-Knopf + immer sichtbares manuelles Eingabefeld als
  * Fallback (GPS-Höhe ist im Wald oft ungenau oder fehlt ganz).
+ *
+ * Das Eingabefeld wird über einen eigenen Text-State gesteuert (nicht über
+ * den validierten Elternwert). Sonst würden Zwischeneingaben wie „8"/„80"
+ * (< Mindesthöhe) sofort als ungültig verworfen und das Feld geleert –
+ * dreistellige Höhen liessen sich gar nicht tippen.
  */
-export function ElevationInput({ hoeheM, onChange }: Props) {
+export function ElevationInput({ onChange }: Props) {
+  const [text, setText] = useState('');
   const [lade, setLade] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -31,6 +37,7 @@ export function ElevationInput({ hoeheM, onChange }: Props) {
         );
       } else {
         const gerundet = Math.round(m.hoeheM);
+        setText(String(gerundet));
         onChange(gerundet);
         const genau =
           m.genauigkeitM != null ? ` (±${Math.round(m.genauigkeitM)} m)` : '';
@@ -50,14 +57,21 @@ export function ElevationInput({ hoeheM, onChange }: Props) {
   function manuell(e: React.ChangeEvent<HTMLInputElement>) {
     setInfo(null);
     const wert = e.target.value;
-    if (wert === '') {
+    setText(wert); // Feld zeigt immer das Getippte – auch Zwischenstände.
+    if (wert.trim() === '') {
       onChange(null);
       setFehler(null);
       return;
     }
     const zahl = Number(wert);
+    if (Number.isNaN(zahl)) {
+      setFehler('Bitte eine Zahl eingeben.');
+      onChange(null);
+      return;
+    }
     const v = validiereHoehe(zahl);
     setFehler(v.ok ? null : v.meldung ?? null);
+    // Nur gültige Werte propagieren; das Feld bleibt unverändert.
     onChange(v.ok ? zahl : null);
   }
 
@@ -75,7 +89,7 @@ export function ElevationInput({ hoeheM, onChange }: Props) {
             type="number"
             inputMode="numeric"
             placeholder="manuell, m ü. M."
-            value={hoeheM ?? ''}
+            value={text}
             onChange={manuell}
             min={100}
             max={4700}

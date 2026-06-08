@@ -250,3 +250,106 @@ input[type='number'] {
   color: var(--muted);
   margin-top: 1.5rem;
 }
+
+/* ── Zeigerpflanzen-Auswahl: Combobox + Chips ───────────────────────── */
+.combobox {
+  position: relative;
+}
+
+.combobox input {
+  font: inherit;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #cdd8d1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #cdd8d1;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.suggestion.aktiv {
+  background: var(--akzent);
+}
+.s-de {
+  font-weight: 600;
+}
+.s-lat {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.pflanzen-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.pflanze-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.4rem 0.4rem 0.7rem;
+  background: #eef5f0;
+  border: 1px solid #d4e3da;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.chip-name em {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border-radius: 50%;
+  background: #d4e3da;
+  color: var(--gruen);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.chip-remove:hover {
+  background: var(--fehler);
+  color: #fff;
+}
+
+.btn-add {
+  width: 100%;
+  margin-top: 0.6rem;
+  background: transparent;
+  color: var(--gruen-hell);
+  border: 1.5px dashed #b6cabd;
+  font-weight: 600;
+}
+.btn-add:hover {
+  background: #f3f8f4;
+}

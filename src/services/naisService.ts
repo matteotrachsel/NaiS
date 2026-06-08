@@ -3,6 +3,7 @@ import type {
   AuswertungInput,
   BaumartEmpfehlung,
   HoehenstufenBereich,
+  Standorteigenschaft,
   Standortstyp,
 } from '@/types/nais';
 import { HOEHENSTUFEN } from '@/data/hoehenstufen';
@@ -46,27 +47,43 @@ function aggregiereBaumarten(standorte: Standortstyp[]): BaumartEmpfehlung[] {
 }
 
 /**
- * Kernfunktion: nimmt Pflanzen-ID + Höhe, führt das NaiS-Mapping durch und
- * liefert Standortstyp(en) sowie eine aggregierte Baumarten-Empfehlung.
+ * Kernfunktion: nimmt eine oder mehrere Zeigerpflanzen-IDs + Höhe, führt das
+ * NaiS-Mapping durch und liefert Standortstyp(en) sowie eine aggregierte
+ * Baumarten-Empfehlung.
+ *
+ * Mehrere Pflanzen werden kombiniert: ihre Zeigerwerte werden vereinigt, was
+ * den Standort enger eingrenzt (entspricht der NaiS-Feldlogik – mehr
+ * Zeigerarten erhöhen die Sicherheit der Ansprache).
  */
-export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErgebnis {
-  const pflanze = ZEIGERPFLANZEN_BY_ID[pflanzenId];
-  if (!pflanze) {
-    throw new Error(`Unbekannte Zeigerpflanze: "${pflanzenId}".`);
+export function werteAusMehrere(
+  pflanzenIds: string[],
+  hoeheM: number,
+): AuswertungErgebnis {
+  const pflanzen = pflanzenIds
+    .map((id) => ZEIGERPFLANZEN_BY_ID[id])
+    .filter((p): p is NonNullable<typeof p> => Boolean(p));
+
+  if (pflanzen.length === 0) {
+    throw new Error('Keine (bekannte) Zeigerpflanze angegeben.');
   }
 
   const hoehenstufe = getHoehenstufe(hoeheM);
   const hinweise: string[] = [];
-  const pflanzenEigenschaften = new Set(pflanze.eigenschaften);
+
+  // Vereinigung der Zeigerwerte aller Pflanzen.
+  const eigenschaften = [
+    ...new Set(pflanzen.flatMap((p) => p.eigenschaften)),
+  ] as Standorteigenschaft[];
+  const eigenschaftenSet = new Set(eigenschaften);
 
   // Kandidaten: Höhenstufe passt UND alle erforderlichen Eigenschaften
-  // werden von der Zeigerpflanze abgedeckt.
-  // Sortierung nach Spezifität: Standorte mit mehr (passenden) geforderten
-  // Eigenschaften zuerst – azonale Typen ohne Bodensignal landen hinten.
+  // werden von der (vereinigten) Zeiger-Bodenökologie abgedeckt.
+  // Sortierung nach Spezifität: Standorte, die mehr der geforderten
+  // Eigenschaften abdecken, zuerst – azonale Typen ohne Bodensignal hinten.
   let standorte = STANDORTTYPEN.filter(
     (s) =>
       s.hoehenstufen.includes(hoehenstufe.stufe) &&
-      s.erforderlicheEigenschaften.every((e) => pflanzenEigenschaften.has(e)),
+      s.erforderlicheEigenschaften.every((e) => eigenschaftenSet.has(e)),
   ).sort(
     (a, b) =>
       b.erforderlicheEigenschaften.length - a.erforderlicheEigenschaften.length,
@@ -76,9 +93,9 @@ export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErg
 
   if (standorte.length === 0) {
     unsicher = true;
-    // Fallback 1: gleiche Eigenschaften, aber Höhenstufe passt nicht exakt.
+    // Fallback: gleiche Eigenschaften, aber Höhenstufe passt nicht exakt.
     const nachEigenschaft = STANDORTTYPEN.filter((s) =>
-      s.erforderlicheEigenschaften.every((e) => pflanzenEigenschaften.has(e)),
+      s.erforderlicheEigenschaften.every((e) => eigenschaftenSet.has(e)),
     );
     if (nachEigenschaft.length > 0) {
       standorte = nachEigenschaft;
@@ -88,8 +105,26 @@ export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErg
       );
     } else {
       hinweise.push(
-        `Für „${pflanze.nameDe}" auf der Stufe „${hoehenstufe.label}" ist noch ` +
-          `kein Standortstyp hinterlegt. Datenbasis erweitern oder Aufnahme manuell prüfen.`,
+        `Für die angegebene(n) Zeigerpflanze(n) auf der Stufe „${hoehenstufe.label}" ` +
+          `ist noch kein Standortstyp hinterlegt. Datenbasis erweitern oder Aufnahme prüfen.`,
+      );
+    }
+  }
+
+  // Hinweis bei widersprüchlichen Säure-/Basenzeigern.
+  if (eigenschaftenSet.has('sauer') && eigenschaftenSet.has('basisch')) {
+    hinweise.push(
+      'Widersprüchliche Säure- und Basenzeiger erfasst – evtl. Standortmosaik ' +
+        'oder Fehlbestimmung. Bodenmerkmale prüfen.',
+    );
+  }
+
+  // Höhenstufen-Plausibilität je Pflanze.
+  for (const p of pflanzen) {
+    if (p.hoehenstufen && !p.hoehenstufen.includes(hoehenstufe.stufe)) {
+      hinweise.push(
+        `„${p.nameDe}" kommt auf der Stufe „${hoehenstufe.label}" normalerweise ` +
+          `nicht vor – Bestimmung oder Höhe prüfen.`,
       );
     }
   }
@@ -102,7 +137,8 @@ export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErg
   }
 
   return {
-    pflanze,
+    pflanzen,
+    eigenschaften,
     hoeheM,
     hoehenstufe,
     standorte,
@@ -110,4 +146,11 @@ export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErg
     unsicher,
     hinweise,
   };
+}
+
+/**
+ * Komfort-Wrapper für genau eine Zeigerpflanze (z. B. aus der Bilderkennung).
+ */
+export function werteAus({ pflanzenId, hoeheM }: AuswertungInput): AuswertungErgebnis {
+  return werteAusMehrere([pflanzenId], hoeheM);
 }

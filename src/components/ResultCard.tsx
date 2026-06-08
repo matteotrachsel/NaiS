@@ -14,7 +14,7 @@ const EIGNUNG_LABEL: Record<string, string> = {
 export function ResultCard({ ergebnis }: Props) {
   if (!ergebnis) return null;
 
-  const { pflanze, hoeheM, hoehenstufe, standorte, empfohleneBaumarten, unsicher, hinweise } =
+  const { pflanzen, eigenschaften, hoeheM, hoehenstufe, standorte, empfohleneBaumarten, unsicher, hinweise } =
     ergebnis;
 
   return (
@@ -23,14 +23,19 @@ export function ResultCard({ ergebnis }: Props) {
 
       <dl className="meta">
         <div>
-          <dt>Zeigerpflanze</dt>
+          <dt>Zeigerpflanze{pflanzen.length > 1 ? 'n' : ''}</dt>
           <dd>
-            {pflanze.nameDe} <em>({pflanze.nameLat})</em>
+            {pflanzen.map((p, i) => (
+              <span key={p.id}>
+                {i > 0 && ', '}
+                {p.nameDe} <em>({p.nameLat})</em>
+              </span>
+            ))}
           </dd>
         </div>
         <div>
           <dt>Bodenökologie</dt>
-          <dd>{pflanze.eigenschaften.join(', ')}</dd>
+          <dd>{eigenschaften.join(', ')}</dd>
         </div>
         <div>
           <dt>Höhe / Stufe</dt>

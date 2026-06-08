@@ -92,7 +92,7 @@ export interface Standortstyp {
   beschreibung?: string;
 }
 
-/** Eingabe für die NaiS-Auswertung. */
+/** Eingabe für die NaiS-Auswertung (Einzelpflanze). */
 export interface AuswertungInput {
   /** Pflanzen-ID (z. B. aus der Bilderkennung) */
   pflanzenId: string;
@@ -102,7 +102,10 @@ export interface AuswertungInput {
 
 /** Ergebnis der NaiS-Auswertung. */
 export interface AuswertungErgebnis {
-  pflanze: Zeigerpflanze;
+  /** alle in die Auswertung eingeflossenen Zeigerpflanzen */
+  pflanzen: Zeigerpflanze[];
+  /** Vereinigung der Zeigerwerte aller Pflanzen */
+  eigenschaften: Standorteigenschaft[];
   hoeheM: number;
   hoehenstufe: HoehenstufenBereich;
   /** bestpassende Standortstypen (kann mehrere geben) */

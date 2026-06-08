@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CameraInput } from '@/components/CameraInput';
 import { ElevationInput } from '@/components/ElevationInput';
+import { PflanzenAuswahl } from '@/components/PflanzenAuswahl';
 import { ResultCard } from '@/components/ResultCard';
 import { useModel } from '@/hooks/useModel';
-import { werteAus } from '@/services/naisService';
-import { ZEIGERPFLANZEN } from '@/data/zeigerpflanzen';
+import { werteAusMehrere } from '@/services/naisService';
 import type { AuswertungErgebnis } from '@/types/nais';
 import type { Vorhersage } from '@/services/recognitionService';
 
 export default function App() {
   const { status, meldung, gecacht } = useModel(true);
-  const [pflanzenId, setPflanzenId] = useState<string | null>(null);
+  const [pflanzenIds, setPflanzenIds] = useState<string[]>([]);
   const [hoeheM, setHoeheM] = useState<number | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
 
@@ -26,16 +26,19 @@ export default function App() {
   }, []);
 
   const ergebnis: AuswertungErgebnis | null = useMemo(() => {
-    if (!pflanzenId || hoeheM == null) return null;
+    if (pflanzenIds.length === 0 || hoeheM == null) return null;
     try {
-      return werteAus({ pflanzenId, hoeheM });
+      return werteAusMehrere(pflanzenIds, hoeheM);
     } catch {
       return null;
     }
-  }, [pflanzenId, hoeheM]);
+  }, [pflanzenIds, hoeheM]);
 
   function handleErkannt(v: Vorhersage) {
-    setPflanzenId(v.pflanzenId);
+    // erkannte Art an die Liste anhängen (statt zu ersetzen), dedupliziert.
+    setPflanzenIds((prev) =>
+      prev.includes(v.pflanzenId) ? prev : [...prev, v.pflanzenId],
+    );
   }
 
   return (
@@ -54,21 +57,7 @@ export default function App() {
       <main>
         <CameraInput onErkannt={handleErkannt} modellBereit={status === 'bereit'} />
 
-        {/* Manuelle Pflanzenwahl als Fallback zur Bilderkennung */}
-        <section className="card">
-          <h2>… oder Zeigerpflanze manuell wählen</h2>
-          <select
-            value={pflanzenId ?? ''}
-            onChange={(e) => setPflanzenId(e.target.value || null)}
-          >
-            <option value="">– Pflanze wählen –</option>
-            {ZEIGERPFLANZEN.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nameDe} ({p.nameLat})
-              </option>
-            ))}
-          </select>
-        </section>
+        <PflanzenAuswahl selectedIds={pflanzenIds} onChange={setPflanzenIds} />
 
         <ElevationInput hoeheM={hoeheM} onChange={setHoeheM} />
 
