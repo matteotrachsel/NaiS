@@ -144,7 +144,7 @@ def main():
     lines.append(" * stattdessen scripts/gen_zeigerpflanzen.py anpassen und neu ausführen.")
     lines.append(" *")
     lines.append(" * `id` entspricht dem (slugifizierten) lateinischen Namen und dient")
-    lines.append(" * zugleich als ML-Klassenname (siehe src/data/modelClasses.ts).")
+    lines.append(" * als Zuordnungsschlüssel (u. a. für die PlantNet-Erkennung).")
     lines.append(" */")
     lines.append("export const ZEIGERPFLANZEN: Zeigerpflanze[] = [")
     for r in rows:

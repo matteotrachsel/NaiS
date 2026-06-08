@@ -4,13 +4,10 @@ import { ElevationInput } from '@/components/ElevationInput';
 import { InstallBanner } from '@/components/InstallBanner';
 import { PflanzenAuswahl } from '@/components/PflanzenAuswahl';
 import { ResultCard } from '@/components/ResultCard';
-import { useModel } from '@/hooks/useModel';
 import { werteAusMehrere } from '@/services/naisService';
 import type { AuswertungErgebnis } from '@/types/nais';
-import type { Vorhersage } from '@/services/recognitionService';
 
 export default function App() {
-  const { status, gecacht } = useModel(true);
   const [pflanzenIds, setPflanzenIds] = useState<string[]>([]);
   const [hoeheM, setHoeheM] = useState<number | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
@@ -35,10 +32,10 @@ export default function App() {
     }
   }, [pflanzenIds, hoeheM]);
 
-  function handleErkannt(v: Vorhersage) {
+  function handleErkannt(pflanzenId: string) {
     // erkannte Art an die Liste anhängen (statt zu ersetzen), dedupliziert.
     setPflanzenIds((prev) =>
-      prev.includes(v.pflanzenId) ? prev : [...prev, v.pflanzenId],
+      prev.includes(pflanzenId) ? prev : [...prev, pflanzenId],
     );
   }
 
@@ -54,7 +51,6 @@ export default function App() {
           <span className={`netstatus ${online ? 'is-online' : 'is-offline'}`}>
             <span className="netstatus-dot" aria-hidden="true" />
             {online ? 'Online' : 'Offline'}
-            {gecacht ? ' · Modell bereit' : ''}
           </span>
         </div>
       </div>
@@ -64,12 +60,17 @@ export default function App() {
         <h1>Baumartenwahl nach NaiS</h1>
         <p className="lead">
           Zeigerpflanzen und Höhe über Meer bestimmen den Waldstandortstyp und damit
-          die geeigneten Baumarten. Erfassung im Feld – vollständig offline.
+          die geeigneten Baumarten. Suche und Auswertung funktionieren offline; die
+          Foto-Erkennung läuft online über PlantNet.
         </p>
       </header>
 
       <main>
-        <CameraInput onErkannt={handleErkannt} modellStatus={status} />
+        <CameraInput
+          onErkannt={handleErkannt}
+          online={online}
+          bereitsGewaehlt={pflanzenIds}
+        />
 
         <PflanzenAuswahl selectedIds={pflanzenIds} onChange={setPflanzenIds} />
 

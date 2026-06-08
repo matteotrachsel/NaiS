@@ -3,6 +3,10 @@ dist
 dev-dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+.vercel
 .DS_Store
 .vite
 *.tsbuildinfo

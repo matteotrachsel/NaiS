@@ -9,7 +9,7 @@ import type { Zeigerpflanze } from '@/types/nais';
  * stattdessen scripts/gen_zeigerpflanzen.py anpassen und neu ausführen.
  *
  * `id` entspricht dem (slugifizierten) lateinischen Namen und dient
- * zugleich als ML-Klassenname (siehe src/data/modelClasses.ts).
+ * als Zuordnungsschlüssel (u. a. für die PlantNet-Erkennung).
  */
 export const ZEIGERPFLANZEN: Zeigerpflanze[] = [
   { id: "campanula_rapunculoides", nameDe: "Ackerglockenblume", nameLat: "Campanula rapunculoides", eigenschaften: ["basisch", "trocken"], hoehenstufen: ["hochmontan"] },
