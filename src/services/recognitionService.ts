@@ -23,6 +23,19 @@ export interface Vorhersage {
   konfidenz: number;
 }
 
+/**
+ * Wird geworfen, wenn (noch) kein Erkennungsmodell hinterlegt ist
+ * (z. B. `/models/zeigerpflanzen/model.json` fehlt → 404). Das ist ein
+ * erwarteter Zustand, kein technischer Fehler – die App bleibt voll
+ * nutzbar (Bestimmung per Textsuche/Manuell).
+ */
+export class ModellNichtVerfuegbarError extends Error {
+  constructor() {
+    super('Es ist noch kein Bilderkennungs-Modell hinterlegt.');
+    this.name = 'ModellNichtVerfuegbarError';
+  }
+}
+
 let modelPromise: Promise<tf.GraphModel | tf.LayersModel> | null = null;
 
 /**
@@ -49,7 +62,21 @@ export async function ladeModell(
 
     // 2) Erstinstallation: aus /models/ laden (vom SW precached) und speichern
     onStatus?.('Modell wird erstmalig vorbereitet (einmalig) …');
-    const model = await loadAnyModel(HTTP_MODEL_URL);
+    let model: tf.GraphModel | tf.LayersModel;
+    try {
+      model = await loadAnyModel(HTTP_MODEL_URL);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      // Kein Modell hinterlegt (404) bzw. nicht ladbar -> erwarteter Zustand.
+      if (/404|failed to parse model json|failed to fetch|networkerror/i.test(msg)) {
+        // Promise zurücksetzen, damit ein späterer Versuch (Modell nachgeliefert)
+        // erneut laden kann.
+        modelPromise = null;
+        throw new ModellNichtVerfuegbarError();
+      }
+      modelPromise = null;
+      throw e;
+    }
     try {
       await model.save(IDB_MODEL_URL);
       onStatus?.('Modell im lokalen Cache gespeichert – ab jetzt voll offline.');

@@ -1,297 +1,350 @@
+/* ============================================================================
+   NaiS Baumartenwahl — Visuelle Sprache im Schweizer International Typographic
+   Style: strenges Raster, Grotesk-Typografie (Helvetica/Frutiger-Anmutung),
+   viel Weissraum, Haarlinien, scharfe Kanten, ein einziger roter Akzent.
+   ========================================================================== */
+
 :root {
-  --gruen: #1b4332;
-  --gruen-hell: #2d6a4f;
-  --akzent: #95d5b2;
-  --warn: #e9c46a;
-  --fehler: #d62828;
-  --bg: #f1f5f2;
-  --card: #ffffff;
-  --text: #1a1a1a;
-  --muted: #5a6b62;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: var(--text);
+  --ink: #1a1a1a;
+  --ink-2: #3f3f3f;
+  --muted: #707070;
+  --bg: #e9e9e7; /* Seitenhintergrund (warmes Grau) */
+  --sheet: #ffffff; /* Inhaltsfläche */
+  --surface-2: #f4f4f2; /* leichte Füllfläche */
+  --line: #d6d6d2; /* Haarlinie */
+  --line-2: #bcbcb7; /* stärkere Linie (Inputs) */
+  --ink-line: #1a1a1a;
+  --red: #d8232a; /* Akzent */
+  --red-dark: #b21d23;
+  --green: #2f7d4f;
+
+  --maxw: 760px;
+
+  font-family: 'Helvetica Neue', Helvetica, Frutiger, Arial, 'Liberation Sans',
+    sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+}
+
+body {
   background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .app {
-  max-width: 640px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 1rem 3rem;
+  background: var(--sheet);
   min-height: 100vh;
+  border-inline: 1px solid var(--line);
 }
 
+/* ── Top-Leiste (schwarz, Marke + Netzstatus) ───────────────────────── */
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 30;
+  background: var(--ink);
+  color: #fff;
+}
+.topbar-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.9rem 1rem;
-  margin: 0 -1rem 1rem;
-  background: var(--gruen);
-  color: #fff;
+  gap: 1rem;
+  padding: 0.65rem 1.5rem;
 }
-
-.topbar h1 {
-  font-size: 1.15rem;
-  margin: 0;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
 }
-
-.sub {
-  margin: 0.15rem 0 0;
-  font-size: 0.8rem;
-  opacity: 0.85;
+.brand-mark {
+  width: 15px;
+  height: 15px;
+  background: var(--red);
+  flex: none;
 }
-
-.status-pill {
-  font-size: 0.72rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+.brand-context {
+  color: #b9b9b9;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  border-left: 1px solid #444;
+  padding-left: 0.6rem;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.status-pill.offline {
-  background: var(--warn);
-  color: #3a2f00;
+.netstatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #d9d9d9;
+  white-space: nowrap;
+}
+.netstatus-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+}
+.netstatus.is-offline .netstatus-dot {
+  background: var(--red);
 }
 
+@media (max-width: 480px) {
+  .brand-context {
+    display: none;
+  }
+}
+
+/* ── Masthead (Titelblock) ──────────────────────────────────────────── */
+.masthead {
+  padding: 2.4rem 1.5rem 1.8rem;
+  border-bottom: 2px solid var(--ink-line);
+}
+.eyebrow {
+  margin: 0 0 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.masthead h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 6vw, 2.3rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+.lead {
+  margin: 0.9rem 0 0;
+  max-width: 56ch;
+  color: var(--ink-2);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+/* ── Inhaltsraster ──────────────────────────────────────────────────── */
+main {
+  padding: 0 1.5rem 2.5rem;
+}
+
+/* Karten = nüchterne Blöcke, durch Haarlinien getrennt, scharfe Kanten. */
 .card {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 1rem 1.1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: var(--sheet);
+  border-bottom: 1px solid var(--line);
+  padding: 1.7rem 0;
+}
+.card:last-of-type {
+  border-bottom: none;
 }
 
 .card h2 {
-  font-size: 1rem;
-  margin: 0 0 0.75rem;
-  color: var(--gruen-hell);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.1rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
-
+.card h2::before {
+  content: '';
+  width: 11px;
+  height: 11px;
+  background: var(--red);
+  flex: none;
+}
 .card h3 {
-  font-size: 0.9rem;
-  margin: 1rem 0 0.4rem;
-  color: var(--gruen);
+  margin: 1.5rem 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
+/* ── Bedienelemente ─────────────────────────────────────────────────── */
 button {
   font: inherit;
   cursor: pointer;
   border: none;
-  border-radius: 10px;
-  padding: 0.8rem 1rem;
+  border-radius: 0;
 }
 
 .btn-primary {
   width: 100%;
-  background: var(--gruen-hell);
+  background: var(--red);
   color: #fff;
-  font-weight: 600;
-  font-size: 1.05rem;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  padding: 0.95rem 1.25rem;
+  transition: background 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--red-dark);
 }
 .btn-primary:disabled {
-  opacity: 0.5;
+  background: #c9c9c4;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
-  background: var(--akzent);
-  color: var(--gruen);
+  background: #fff;
+  color: var(--ink);
   font-weight: 600;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--ink);
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-add {
+  width: 100%;
+  margin-top: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--line-2);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.btn-add:hover {
+  border-color: var(--red);
+  color: var(--red);
 }
 
 select,
-input[type='number'] {
+input[type='number'],
+input[type='text'],
+.combobox input {
   font: inherit;
   width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #cdd8d1;
-  border-radius: 10px;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid var(--line-2);
+  border-radius: 0;
   background: #fff;
+  color: var(--ink);
+}
+select:focus,
+input:focus,
+.combobox input:focus {
+  outline: 2px solid var(--red);
+  outline-offset: -1px;
+  border-color: var(--red);
 }
 
+/* Höhe-Eingabe */
 .hoehe-zeile {
   display: flex;
   gap: 0.6rem;
   align-items: stretch;
 }
-.hoehe-zeile .btn-secondary {
-  white-space: nowrap;
-}
 .hoehe-feld {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex: 1;
 }
 .hoehe-feld span {
   color: var(--muted);
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
+/* ── Foto-Erkennung ─────────────────────────────────────────────────── */
 .vorschau {
   display: block;
   width: 100%;
-  max-height: 240px;
+  max-height: 260px;
   object-fit: cover;
-  border-radius: 10px;
-  margin-top: 0.8rem;
+  margin-top: 1rem;
+  border: 1px solid var(--line);
 }
-
 .vorhersagen {
   list-style: none;
   padding: 0;
-  margin: 0.8rem 0 0;
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--line);
 }
 .vorhersagen li {
   display: flex;
   justify-content: space-between;
-  padding: 0.45rem 0.2rem;
-  border-bottom: 1px solid #eef2ef;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
 }
 .konfidenz {
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
 
-.meta {
-  display: grid;
-  gap: 0.4rem;
-  margin: 0 0 0.5rem;
-}
-.meta > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.meta dt {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.meta dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 500;
-}
-
-.standorte,
-.baumarten {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.standorte li {
-  padding: 0.5rem 0;
-}
-.standorte p {
-  margin: 0.25rem 0 0;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.baumart {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.55rem 0.7rem;
-  border-radius: 9px;
-  margin-bottom: 0.4rem;
-  background: #f3f8f4;
-}
-.baumart--hauptbaumart {
-  background: var(--akzent);
-}
-.baumart-eignung {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--gruen);
-}
-
-.ergebnis--unsicher {
-  border: 1px solid var(--warn);
-}
-
-.hinweis {
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin: 0.5rem 0 0;
-}
-.fehler {
-  color: var(--fehler);
-  font-size: 0.85rem;
-  margin: 0.5rem 0 0;
-}
-.disclaimer {
-  margin-top: 1rem;
-  font-size: 0.72rem;
-  color: var(--muted);
-  font-style: italic;
-}
-
-.modell-status {
-  text-align: center;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
-.footer {
-  text-align: center;
-  color: var(--muted);
-  margin-top: 1.5rem;
-}
-
-/* ── Zeigerpflanzen-Auswahl: Combobox + Chips ───────────────────────── */
+/* ── Combobox / Autocomplete ────────────────────────────────────────── */
 .combobox {
   position: relative;
 }
-
-.combobox input {
-  font: inherit;
-  width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #cdd8d1;
-  border-radius: 10px;
-  background: #fff;
-}
-
 .suggestions {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 4px);
+  top: calc(100% - 1px);
   left: 0;
   right: 0;
   margin: 0;
-  padding: 0.25rem;
+  padding: 0;
   list-style: none;
   background: #fff;
-  border: 1px solid #cdd8d1;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  max-height: 280px;
+  border: 1px solid var(--ink);
+  max-height: 290px;
   overflow-y: auto;
 }
-
 .suggestion {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.5rem 0.6rem;
-  border-radius: 8px;
+  gap: 0.05rem;
+  padding: 0.55rem 0.8rem;
   cursor: pointer;
+  border-bottom: 1px solid var(--line);
+}
+.suggestion:last-child {
+  border-bottom: none;
 }
 .suggestion.aktiv {
-  background: var(--akzent);
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 var(--red);
 }
 .s-de {
   font-weight: 600;
@@ -302,54 +355,218 @@ input[type='number'] {
   color: var(--muted);
 }
 
+/* ── Zeigerpflanzen-Chips ───────────────────────────────────────────── */
 .pflanzen-chips {
   list-style: none;
   padding: 0;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.9rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
 }
 .pflanze-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.4rem 0.4rem 0.7rem;
-  background: #eef5f0;
-  border: 1px solid #d4e3da;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.chip-name {
+  font-weight: 600;
 }
 .chip-name em {
   color: var(--muted);
-  font-size: 0.82rem;
+  font-weight: 400;
+  font-size: 0.86rem;
 }
 .chip-remove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.7rem;
+  height: 1.7rem;
   padding: 0;
-  border-radius: 50%;
-  background: #d4e3da;
-  color: var(--gruen);
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line-2);
   font-size: 0.8rem;
   line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .chip-remove:hover {
-  background: var(--fehler);
+  background: var(--red);
+  border-color: var(--red);
   color: #fff;
 }
 
-.btn-add {
-  width: 100%;
-  margin-top: 0.6rem;
-  background: transparent;
-  color: var(--gruen-hell);
-  border: 1.5px dashed #b6cabd;
+/* ── Ergebnis / Auswertung ──────────────────────────────────────────── */
+.ergebnis {
+  border-top: 3px solid var(--red);
+  padding-top: 1.5rem;
+}
+.ergebnis--unsicher {
+  border-top-color: var(--muted);
+}
+
+.meta {
+  display: grid;
+  gap: 0;
+  margin: 0 0 0.5rem;
+  border-top: 1px solid var(--line);
+}
+.meta > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.meta dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: none;
+}
+.meta dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+.standorte {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.standorte li {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.standorte li:last-child {
+  border-bottom: none;
+}
+.standorte strong {
+  display: block;
   font-weight: 600;
 }
-.btn-add:hover {
-  background: #f3f8f4;
+.standorte p {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.baumarten {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.baumart {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 0.4rem;
+  background: var(--surface-2);
+  border-left: 3px solid var(--line-2);
+}
+.baumart--hauptbaumart {
+  border-left-color: var(--red);
+  background: #fbeceb;
+}
+.baumart--nebenbaumart {
+  border-left-color: var(--ink);
+}
+.baumart-name em {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.86rem;
+}
+.baumart-eignung {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.baumart--hauptbaumart .baumart-eignung {
+  color: var(--red);
+}
+
+/* ── Hinweise / Meldungen ───────────────────────────────────────────── */
+.hinweise {
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.5rem;
+}
+.hinweis {
+  font-size: 0.86rem;
+  color: var(--ink-2);
+  margin: 0.5rem 0 0;
+  line-height: 1.5;
+}
+.fehler {
+  color: var(--red);
+  font-size: 0.88rem;
+  margin: 0.6rem 0 0;
+}
+.disclaimer {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+.footer {
+  border-top: 2px solid var(--ink-line);
+  padding: 1.4rem 1.5rem 2.2rem;
+}
+.footer-line {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.footer-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ── Ladechoreografie beim Start (zurückhaltend) ────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  main > .card,
+  .masthead {
+    animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .masthead {
+    animation-delay: 0.02s;
+  }
+  main > .card:nth-child(1) {
+    animation-delay: 0.08s;
+  }
+  main > .card:nth-child(2) {
+    animation-delay: 0.14s;
+  }
+  main > .card:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  main > .card:nth-child(4) {
+    animation-delay: 0.26s;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

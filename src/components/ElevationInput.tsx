@@ -77,7 +77,7 @@ export function ElevationInput({ onChange }: Props) {
 
   return (
     <section className="card">
-      <h2>2 · Höhe über Meer</h2>
+      <h2>Höhe über Meer</h2>
 
       <div className="hoehe-zeile">
         <button className="btn-secondary" onClick={gpsLesen} disabled={lade}>

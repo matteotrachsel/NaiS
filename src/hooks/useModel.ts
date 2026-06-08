@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ladeModell, istModellGecacht } from '@/services/recognitionService';
+import {
+  ladeModell,
+  istModellGecacht,
+  ModellNichtVerfuegbarError,
+} from '@/services/recognitionService';
 
-type ModelStatus = 'idle' | 'laden' | 'bereit' | 'fehler';
+/** 'fehlt' = (noch) kein Modell hinterlegt (erwartet); 'fehler' = echter Fehler. */
+export type ModelStatus = 'idle' | 'laden' | 'bereit' | 'fehlt' | 'fehler';
 
 /**
  * Kümmert sich um das Laden/Cachen des ML-Modells und stellt den Status
@@ -20,8 +25,15 @@ export function useModel(preload = true) {
       setGecacht(await istModellGecacht());
       setStatus('bereit');
     } catch (e) {
-      setStatus('fehler');
-      setMeldung(e instanceof Error ? e.message : 'Modell konnte nicht geladen werden.');
+      if (e instanceof ModellNichtVerfuegbarError) {
+        setStatus('fehlt');
+        setMeldung('');
+      } else {
+        setStatus('fehler');
+        setMeldung(
+          e instanceof Error ? e.message : 'Modell konnte nicht geladen werden.',
+        );
+      }
     }
   }, []);
 

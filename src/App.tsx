@@ -9,7 +9,7 @@ import type { AuswertungErgebnis } from '@/types/nais';
 import type { Vorhersage } from '@/services/recognitionService';
 
 export default function App() {
-  const { status, meldung, gecacht } = useModel(true);
+  const { status, gecacht } = useModel(true);
   const [pflanzenIds, setPflanzenIds] = useState<string[]>([]);
   const [hoeheM, setHoeheM] = useState<number | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
@@ -43,33 +43,47 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div>
-          <h1>🌲 NaiS Baumartenwahl</h1>
-          <p className="sub">Offline-Entscheidungshilfe für den Schutzwald</p>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <span className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            <span className="brand-name">NaiS</span>
+            <span className="brand-context">Baumartenwahl im Schutzwald</span>
+          </span>
+          <span className={`netstatus ${online ? 'is-online' : 'is-offline'}`}>
+            <span className="netstatus-dot" aria-hidden="true" />
+            {online ? 'Online' : 'Offline'}
+            {gecacht ? ' · Modell bereit' : ''}
+          </span>
         </div>
-        <span className={`status-pill ${online ? 'online' : 'offline'}`}>
-          {online ? 'Online' : 'Offline'}
-          {gecacht ? ' · Modell ✓' : ''}
-        </span>
+      </div>
+
+      <header className="masthead">
+        <p className="eyebrow">Waldstandort · standortgerechte Baumartenwahl</p>
+        <h1>Baumartenwahl nach NaiS</h1>
+        <p className="lead">
+          Zeigerpflanzen und Höhe über Meer bestimmen den Waldstandortstyp und damit
+          die geeigneten Baumarten. Erfassung im Feld – vollständig offline.
+        </p>
       </header>
 
       <main>
-        <CameraInput onErkannt={handleErkannt} modellBereit={status === 'bereit'} />
+        <CameraInput onErkannt={handleErkannt} modellStatus={status} />
 
         <PflanzenAuswahl selectedIds={pflanzenIds} onChange={setPflanzenIds} />
 
         <ElevationInput hoeheM={hoeheM} onChange={setHoeheM} />
 
         <ResultCard ergebnis={ergebnis} />
-
-        {status !== 'bereit' && (
-          <p className="modell-status">{meldung || 'Modell wird geladen …'}</p>
-        )}
       </main>
 
       <footer className="footer">
-        <small>NaiS · lokale Datenbasis · v0.1 – keine Serververbindung nötig</small>
+        <p className="footer-line">
+          NaiS Baumartenwahl · lokale Datenbasis · ohne Serververbindung nutzbar
+        </p>
+        <p className="footer-meta">
+          Entscheidungshilfe – ersetzt keine standortkundliche Beurteilung im Feld.
+        </p>
       </footer>
     </div>
   );

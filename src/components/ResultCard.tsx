@@ -19,7 +19,7 @@ export function ResultCard({ ergebnis }: Props) {
 
   return (
     <section className={`card ergebnis ${unsicher ? 'ergebnis--unsicher' : ''}`}>
-      <h2>3 · NaiS-Empfehlung</h2>
+      <h2>Auswertung</h2>
 
       <dl className="meta">
         <div>
