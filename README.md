@@ -51,6 +51,18 @@ npm run preview    # Build lokal testen
 > siehe dortige `README.md`. Ohne Modell funktionieren NaiS-Logik und manuelle
 > Pflanzenwahl trotzdem.
 
+### Installation (PWA)
+
+Die App ist installierbar (Home-Bildschirm, eigenes Fenster, Offline-Start):
+
+- **Android/Chromium:** Ein Banner („App installieren") löst den nativen Dialog
+  aus (`beforeinstallprompt`). Voraussetzung sind die generierten Icons
+  (`python scripts/gen_icons.py` → `public/icons/`).
+- **iOS/Safari:** keine native API – das Banner zeigt die Anleitung
+  (Teilen → „Zum Home-Bildschirm").
+
+Logik in `src/hooks/useInstallPrompt.ts`, UI in `src/components/InstallBanner.tsx`.
+
 ## Datenbasis
 
 Die forstliche Datenbasis stammt direkt aus dem NaiS-Ordner

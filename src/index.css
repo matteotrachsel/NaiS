@@ -538,6 +538,114 @@ input:focus,
   color: var(--muted);
 }
 
+/* ── Installations-Banner (PWA) ─────────────────────────────────────── */
+body.has-install-banner .footer {
+  padding-bottom: 6rem;
+}
+
+.install {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--maxw);
+  z-index: 40;
+  background: #fff;
+  border-top: 2px solid var(--ink-line);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+  animation: slideup 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.install-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.5rem;
+}
+.install-mark {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  background: var(--ink);
+  background-image: linear-gradient(135deg, var(--red) 0 50%, #3f3f3f 50% 100%);
+}
+.install-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.install-text strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.install-text span {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.install-cta {
+  flex: none;
+  background: var(--red);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0;
+  transition: background 0.15s ease;
+}
+.install-cta:hover {
+  background: var(--red-dark);
+}
+.install-close {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line-2);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.install-close:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.install-ios {
+  margin: 0;
+  padding: 0.4rem 1.5rem 1.1rem 2.7rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.86rem;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.install-ios em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ios-share-icon {
+  vertical-align: -3px;
+  color: #0a84ff; /* iOS-Systemblau für Wiedererkennung */
+}
+
+@media (max-width: 480px) {
+  .install-text span {
+    display: none;
+  }
+}
+
+@keyframes slideup {
+  from {
+    transform: translate(-50%, 100%);
+  }
+  to {
+    transform: translate(-50%, 0);
+  }
+}
+
 /* ── Ladechoreografie beim Start (zurückhaltend) ────────────────────── */
 @media (prefers-reduced-motion: no-preference) {
   main > .card,

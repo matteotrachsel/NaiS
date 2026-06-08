@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CameraInput } from '@/components/CameraInput';
 import { ElevationInput } from '@/components/ElevationInput';
+import { InstallBanner } from '@/components/InstallBanner';
 import { PflanzenAuswahl } from '@/components/PflanzenAuswahl';
 import { ResultCard } from '@/components/ResultCard';
 import { useModel } from '@/hooks/useModel';
@@ -76,6 +77,8 @@ export default function App() {
 
         <ResultCard ergebnis={ergebnis} />
       </main>
+
+      <InstallBanner />
 
       <footer className="footer">
         <p className="footer-line">
