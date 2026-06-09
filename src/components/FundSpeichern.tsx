@@ -3,7 +3,11 @@ import type { AuswertungErgebnis } from '@/types/nais';
 import type { Beobachtung } from '@/types/karte';
 import { firebaseKonfiguriert } from '@/services/firebase';
 import { speichereBeobachtung } from '@/services/observationService';
-import { ermittleHoehe, GeolocationFehler } from '@/services/elevationService';
+import {
+  ermittleHoehe,
+  GeolocationFehler,
+  istInSchweiz,
+} from '@/services/elevationService';
 
 interface Props {
   ergebnis: AuswertungErgebnis;
@@ -41,6 +45,14 @@ export function FundSpeichern({ ergebnis }: Props) {
     setMeldung('Standort wird ermittelt … (bitte Standortzugriff erlauben)');
     try {
       const pos = await ermittleHoehe();
+
+      if (!istInSchweiz(pos.lat, pos.lon)) {
+        throw new Error(
+          `Der ermittelte Standort (${pos.lat.toFixed(4)}, ${pos.lon.toFixed(4)}) liegt ` +
+            `ausserhalb der Schweiz. Es lassen sich nur Fundpunkte in der Schweiz speichern – ` +
+            `GPS/Standort prüfen.`,
+        );
+      }
 
       setMeldung('Speichere auf der Karte …');
       const top = ergebnis.standorte[0] ?? null;

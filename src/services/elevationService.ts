@@ -93,6 +93,21 @@ function uebersetzeFehler(code: number): string {
   }
 }
 
+/**
+ * Grobe Bounding-Box der Schweiz (identisch zur Prüfung in firestore.rules).
+ * Fundpunkte ausserhalb werden nicht gespeichert.
+ */
+export const CH_BOUNDS = { latMin: 45.8, latMax: 47.9, lonMin: 5.9, lonMax: 10.6 };
+
+export function istInSchweiz(lat: number, lon: number): boolean {
+  return (
+    lat >= CH_BOUNDS.latMin &&
+    lat <= CH_BOUNDS.latMax &&
+    lon >= CH_BOUNDS.lonMin &&
+    lon <= CH_BOUNDS.lonMax
+  );
+}
+
 /** Validiert eine manuell eingegebene Höhe (Schweiz: ~190–4634 m ü. M.). */
 export function validiereHoehe(eingabe: number): { ok: boolean; meldung?: string } {
   if (Number.isNaN(eingabe)) {

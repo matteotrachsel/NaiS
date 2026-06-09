@@ -76,13 +76,18 @@ export async function restCreate(
   } catch {
     throw new Error('Keine Verbindung zur Datenbank. Internet prüfen und erneut versuchen.');
   }
-  if (res.status === 401 || res.status === 403) {
-    throw new Error(
-      'Speichern abgelehnt (Firestore-Regeln/API-Key). Eingabe oder Regeln prüfen.',
-    );
-  }
   if (!res.ok) {
-    throw new Error(`Speichern fehlgeschlagen (HTTP ${res.status}). Bitte erneut versuchen.`);
+    let detail = '';
+    try {
+      const j = (await res.json()) as { error?: { message?: string; status?: string } };
+      detail = j?.error?.message ? ` – ${j.error.message}` : '';
+    } catch {
+      /* kein JSON-Body */
+    }
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(`Speichern abgelehnt (HTTP ${res.status})${detail}.`);
+    }
+    throw new Error(`Speichern fehlgeschlagen (HTTP ${res.status})${detail}.`);
   }
 }
 
