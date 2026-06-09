@@ -4,14 +4,17 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 // @ts-expect-error – reine JS-Hilfsdatei ohne Typen
 import { identify } from './api/_plantnet.mjs';
+// @ts-expect-error – reine JS-Hilfsdatei ohne Typen
+import { fsCreate, fsList } from './api/_firestore.mjs';
 
 /**
- * Dev-Middleware: bildet den Vercel-Serverless-Proxy `/api/identify` lokal
- * nach, damit `npm run dev` ebenfalls über PlantNet erkennt.
+ * Dev-Middleware: bildet die Vercel-Serverless-Proxys `/api/identify`
+ * (PlantNet) und `/api/firestore` (Firestore) lokal nach, damit `npm run dev`
+ * dieselben Endpunkte bietet wie die Produktion.
  */
-function plantnetDevProxy(): Plugin {
+function apiDevProxy(): Plugin {
   return {
-    name: 'plantnet-dev-proxy',
+    name: 'api-dev-proxy',
     apply: 'serve',
     configureServer(server) {
       server.middlewares.use('/api/identify', async (req, res) => {
@@ -33,6 +36,36 @@ function plantnetDevProxy(): Plugin {
           res.end(JSON.stringify({ error: String(e) }));
         }
       });
+
+      server.middlewares.use('/api/firestore', async (req, res) => {
+        try {
+          const url = new URL(req.url ?? '', 'http://localhost');
+          const collection = url.searchParams.get('collection') ?? '';
+          if (collection !== 'observations' && collection !== 'zonen') {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Unbekannte Collection.' }));
+            return;
+          }
+          let out;
+          if (req.method === 'GET') {
+            out = await fsList(collection, 300);
+          } else if (req.method === 'POST') {
+            let raw = '';
+            for await (const chunk of req) raw += chunk;
+            out = await fsCreate(collection, JSON.parse(raw || '{}'));
+          } else {
+            res.statusCode = 405;
+            res.end('Method Not Allowed');
+            return;
+          }
+          res.statusCode = out.status;
+          res.setHeader('content-type', 'application/json');
+          res.end(out.body);
+        } catch (e) {
+          res.statusCode = 502;
+          res.end(JSON.stringify({ error: String(e) }));
+        }
+      });
     },
   };
 }
@@ -42,7 +75,13 @@ export default defineConfig(({ mode }) => {
   // Nicht-prefixte Env-Vars (z. B. PLANTNET_API_KEY aus .env) in process.env
   // spiegeln, damit die Dev-Middleware den Key findet.
   const env = loadEnv(mode, process.cwd(), '');
-  if (env.PLANTNET_API_KEY) process.env.PLANTNET_API_KEY = env.PLANTNET_API_KEY;
+  for (const k of [
+    'PLANTNET_API_KEY',
+    'VITE_FIREBASE_PROJECT_ID',
+    'VITE_FIREBASE_API_KEY',
+  ]) {
+    if (env[k]) process.env[k] = env[k];
+  }
 
   return {
   resolve: {
@@ -51,7 +90,7 @@ export default defineConfig(({ mode }) => {
     },
   },
   plugins: [
-    plantnetDevProxy(),
+    apiDevProxy(),
     react(),
     VitePWA({
       // 'autoUpdate' = neuer Service Worker übernimmt sofort beim nächsten Start.

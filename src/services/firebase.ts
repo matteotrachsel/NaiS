@@ -1,17 +1,11 @@
 /**
- * Konfiguration für den Firestore-Zugriff über die REST-API.
+ * Client-Flag für die geteilte Karte.
  *
- * Bewusst OHNE Firebase-SDK: dessen WebChannel-/Long-Polling-Transport bleibt
- * in manchen Mobilfunk-/Proxy-Netzen hängen. Stattdessen sprechen wir die
- * Firestore-REST-API mit einzelnen HTTPS-Requests an (siehe firestoreRest.ts).
- *
- * `apiKey`/`projectId` sind die öffentliche Firebase-Web-Config; der Schutz
- * erfolgt über die Firestore-Security-Rules.
+ * Der eigentliche Firestore-Zugriff läuft serverseitig über den Proxy
+ * `/api/firestore` (siehe firestoreRest.ts + api/firestore.js). Im Client wird
+ * nur noch geprüft, ob die Funktion grundsätzlich aktiv ist – der API-Key
+ * liegt ausschliesslich serverseitig.
  */
-const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined;
-const apiKey = import.meta.env.VITE_FIREBASE_API_KEY as string | undefined;
-
-/** true, wenn projectId + apiKey gesetzt sind (Karte/Speichern verfügbar). */
-export const firebaseKonfiguriert = Boolean(projectId && apiKey);
-
-export const FIREBASE = { projectId, apiKey };
+export const firebaseKonfiguriert = Boolean(
+  import.meta.env.VITE_FIREBASE_PROJECT_ID,
+);
