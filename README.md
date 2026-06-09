@@ -20,6 +20,22 @@ PlantNet.
 - **vite-plugin-pwa** (Workbox) – App-Shell + Daten precached → Offline-Start
 - **PlantNet-API** – Online-Bilderkennung (`my-api.plantnet.org`)
 - **HTML5 Geolocation API** – Höhe via `coords.altitude`, manueller Fallback
+- **Leaflet + swisstopo** – geteilte Fundpunkt-Karte (Ansicht „Karte")
+- **Firebase Firestore** – geteilte Speicherung der Fundpunkte/Zonen
+
+## Geteilte Karte
+
+Die Ansicht **„Karte"** zeigt alle per App gespeicherten Fundpunkte (öffentlich
+lesbar). Aus den Fundpunkten lassen sich Waldgebiete einteilen – per
+automatischem Aggregations-Raster oder durch manuelles Zeichnen von Zonen
+(mit abgeleitetem Standortstyp + Baumarten).
+
+- **Config:** `VITE_FIREBASE_*` (Firebase-Web-Config, öffentlich) in `.env`
+  bzw. als Vercel-Env. Ohne Config zeigt die Karte einen Hinweis; Bestimmung
+  und Suche bleiben offline nutzbar.
+- **Sicherheit:** `firestore.rules` (öffentlich lesen; anonym anlegen mit
+  CH-Plausibilitätsprüfung; kein Ändern/Löschen) – in der Firebase-Console unter
+  Firestore → Regeln veröffentlichen.
 
 ## Projektstruktur
 
