@@ -5,12 +5,26 @@
 //
 // Projekt/Key aus den (auch serverseitig verfügbaren) Env-Variablen.
 
+// Entfernt ein evtl. vorangestelltes BOM/Zero-Width-Zeichen sowie
+// umgebende Whitespaces – Env-Variablen können (z. B. via CLI/Pipe) ein
+// BOM enthalten, das sonst die Projekt-ID/den Key ungültig macht
+// (CONSUMER_INVALID / "permission denied on resource project").
+function clean(v) {
+  if (typeof v !== 'string') return v;
+  let s = v.trim();
+  // Führendes BOM (U+FEFF) bzw. Zero-Width-Space (U+200B) entfernen.
+  while (s.length && (s.charCodeAt(0) === 0xfeff || s.charCodeAt(0) === 0x200b)) {
+    s = s.slice(1);
+  }
+  return s.trim();
+}
+
 // Env lazy lesen (erst beim Aufruf), damit das Spiegeln in der Vite-Dev-
 // Middleware vor dem ersten Zugriff greift.
 function envWerte() {
   return {
-    PROJECT: process.env.VITE_FIREBASE_PROJECT_ID,
-    KEY: process.env.VITE_FIREBASE_API_KEY,
+    PROJECT: clean(process.env.VITE_FIREBASE_PROJECT_ID),
+    KEY: clean(process.env.VITE_FIREBASE_API_KEY),
   };
 }
 
