@@ -28,8 +28,10 @@ export class GeolocationFehler extends Error {
 
 const DEFAULT_OPTIONS: PositionOptions = {
   enableHighAccuracy: true,
-  timeout: 15_000,
-  maximumAge: 0,
+  timeout: 12_000,
+  // Eine bis zu 1 Minute alte Position akzeptieren -> schneller, vermeidet
+  // unnötiges Warten auf einen frischen Fix.
+  maximumAge: 60_000,
 };
 
 /**

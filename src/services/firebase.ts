@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getFirestore, type Firestore } from 'firebase/firestore';
+import { initializeFirestore, type Firestore } from 'firebase/firestore';
 
 /**
  * Firebase-/Firestore-Anbindung für die geteilte Fundpunkt-Karte.
@@ -30,7 +30,9 @@ export function getDb(): Firestore {
   }
   if (!db) {
     app = initializeApp(cfg as Record<string, string>);
-    db = getFirestore(app);
+    // Long-Polling automatisch erkennen -> robuster in Mobilfunk-/Proxy-Netzen,
+    // in denen der WebChannel-Transport sonst hängen bleiben kann.
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
   }
   return db;
 }

@@ -11,6 +11,14 @@ interface Props {
 
 type Status = 'idle' | 'speichern' | 'fertig' | 'fehler';
 
+/** Lehnt ab, wenn `p` nicht innerhalb von `ms` erfüllt wird. */
+function mitTimeout<T>(p: Promise<T>, ms: number, meldung: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(meldung)), ms)),
+  ]);
+}
+
 /**
  * Speichert die aktuelle Bestimmung als Fundpunkt auf der geteilten Karte.
  * Holt dafür beim Klick die GPS-Position (explizites Opt-in der Standortfreigabe).
@@ -30,9 +38,11 @@ export function FundSpeichern({ ergebnis }: Props) {
 
   async function speichern() {
     setStatus('speichern');
-    setMeldung('Standort wird ermittelt …');
+    setMeldung('Standort wird ermittelt … (bitte Standortzugriff erlauben)');
     try {
       const pos = await ermittleHoehe();
+
+      setMeldung('Speichere auf der Karte …');
       const top = ergebnis.standorte[0] ?? null;
       const beobachtung: Beobachtung = {
         lat: pos.lat,
@@ -47,7 +57,12 @@ export function FundSpeichern({ ergebnis }: Props) {
         naisCode: top?.naisCode ?? null,
         hoehenstufe: ergebnis.hoehenstufe.label,
       };
-      await speichereBeobachtung(beobachtung);
+      // Schreibvorgang mit Timeout absichern, damit die UI nie endlos hängt.
+      await mitTimeout(
+        speichereBeobachtung(beobachtung),
+        20_000,
+        'Zeitüberschreitung beim Speichern – Internetverbindung prüfen und erneut versuchen.',
+      );
       setStatus('fertig');
       setMeldung('Fund auf der Karte gespeichert. Danke fürs Beitragen!');
     } catch (e) {
@@ -55,7 +70,9 @@ export function FundSpeichern({ ergebnis }: Props) {
       setMeldung(
         e instanceof GeolocationFehler
           ? e.message
-          : 'Speichern fehlgeschlagen. Internet/Standort prüfen und erneut versuchen.',
+          : e instanceof Error
+            ? e.message
+            : 'Speichern fehlgeschlagen. Internet/Standort prüfen und erneut versuchen.',
       );
     }
   }
