@@ -1,28 +1,9 @@
-import {
-  addDoc,
-  collection,
-  getDocs,
-  limit as fbLimit,
-  orderBy,
-  query,
-  serverTimestamp,
-  Timestamp,
-  type DocumentData,
-} from 'firebase/firestore';
-import { getDb } from './firebase';
+import { restCreate, restList } from './firestoreRest';
 import type { Beobachtung, Zone } from '@/types/karte';
 
 const OBS = 'observations';
 const ZONEN = 'zonen';
 
-/** Wandelt einen Firestore-Timestamp in ms (Epoch) um. */
-function zeitMs(v: unknown): number | undefined {
-  if (v instanceof Timestamp) return v.toMillis();
-  if (typeof v === 'number') return v;
-  return undefined;
-}
-
-/** Entfernt das `id`-Feld vor dem Schreiben. */
 function ohneId<T extends { id?: string }>(obj: T): Omit<T, 'id'> {
   const { id: _id, ...rest } = obj;
   void _id;
@@ -30,35 +11,23 @@ function ohneId<T extends { id?: string }>(obj: T): Omit<T, 'id'> {
 }
 
 export async function speichereBeobachtung(b: Beobachtung): Promise<void> {
-  await addDoc(collection(getDb(), OBS), {
-    ...ohneId(b),
-    createdAt: serverTimestamp(),
-  });
+  await restCreate(OBS, { ...ohneId(b), createdAt: Date.now() });
 }
 
-export async function ladeBeobachtungen(max = 2000): Promise<Beobachtung[]> {
-  const snap = await getDocs(
-    query(collection(getDb(), OBS), orderBy('createdAt', 'desc'), fbLimit(max)),
+export async function ladeBeobachtungen(max = 300): Promise<Beobachtung[]> {
+  const docs = await restList(OBS, max);
+  return (docs as unknown as Beobachtung[]).sort(
+    (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
   );
-  return snap.docs.map((d) => {
-    const data = d.data() as DocumentData;
-    return { id: d.id, ...data, createdAt: zeitMs(data.createdAt) } as Beobachtung;
-  });
 }
 
 export async function speichereZone(z: Zone): Promise<void> {
-  await addDoc(collection(getDb(), ZONEN), {
-    ...ohneId(z),
-    createdAt: serverTimestamp(),
-  });
+  await restCreate(ZONEN, { ...ohneId(z), createdAt: Date.now() });
 }
 
-export async function ladeZonen(max = 500): Promise<Zone[]> {
-  const snap = await getDocs(
-    query(collection(getDb(), ZONEN), orderBy('createdAt', 'desc'), fbLimit(max)),
+export async function ladeZonen(max = 300): Promise<Zone[]> {
+  const docs = await restList(ZONEN, max);
+  return (docs as unknown as Zone[]).sort(
+    (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
   );
-  return snap.docs.map((d) => {
-    const data = d.data() as DocumentData;
-    return { id: d.id, ...data, createdAt: zeitMs(data.createdAt) } as Zone;
-  });
 }
