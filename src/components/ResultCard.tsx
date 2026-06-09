@@ -1,4 +1,5 @@
 import type { AuswertungErgebnis } from '@/types/nais';
+import { FundSpeichern } from '@/components/FundSpeichern';
 
 interface Props {
   ergebnis: AuswertungErgebnis | null;
@@ -85,6 +86,8 @@ export function ResultCard({ ergebnis }: Props) {
           ))}
         </div>
       )}
+
+      {standorte.length > 0 && <FundSpeichern ergebnis={ergebnis} />}
 
       <p className="disclaimer">
         Entscheidungshilfe – ersetzt keine standortkundliche Beurteilung im Feld.

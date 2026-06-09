@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Security Rules für die geteilte NaiS-Fundpunkt-Karte.
+// Modell: öffentlich lesbar; anonym anlegen (mit Plausibilitätsprüfung);
+// kein Ändern/Löschen. In der Firebase-Console unter
+// Firestore Database -> Regeln einfügen und veröffentlichen.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function inCH(lat, lon) {
+      return lat is number && lon is number
+        && lat >= 45.8 && lat <= 47.9
+        && lon >= 5.9 && lon <= 10.6;
+    }
+
+    match /observations/{id} {
+      allow read: if true;
+      allow create: if inCH(request.resource.data.lat, request.resource.data.lon)
+        && request.resource.data.pflanzenIds is list
+        && request.resource.data.pflanzenIds.size() > 0
+        && request.resource.data.eigenschaften is list;
+      allow update, delete: if false;
+    }
+
+    match /zonen/{id} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.polygon is list
+        && request.resource.data.polygon.size() >= 3;
+      allow update, delete: if false;
+    }
+  }
+}

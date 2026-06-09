@@ -607,6 +607,163 @@ input:focus,
   color: var(--muted);
 }
 
+/* ── Tabs (Bestimmen / Karte) ───────────────────────────────────────── */
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  display: flex;
+  background: var(--sheet);
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--muted);
+  border-radius: 0;
+}
+.tab.aktiv {
+  color: var(--ink);
+  border-bottom-color: var(--red);
+}
+
+/* ── Karte ──────────────────────────────────────────────────────────── */
+.karte-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.karte-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.tool {
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: 0;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tool.aktiv {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.tool.aktiv-rot {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+.tool-info {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.tool-zaehler {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.karte-flaeche {
+  position: relative;
+}
+.leaflet-karte {
+  width: 100%;
+  height: 68vh;
+  min-height: 380px;
+  z-index: 1;
+}
+
+.map-legende {
+  position: absolute;
+  z-index: 500;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  font-size: 0.74rem;
+}
+.legende-titel {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.66rem;
+  color: var(--muted);
+  margin-bottom: 0.1rem;
+}
+.legende-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.legende-punkt {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid #1a1a1a;
+}
+
+.zone-panel {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.zone-aggregat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.88rem;
+  margin-bottom: 0.7rem;
+}
+.zone-form {
+  display: flex;
+  gap: 0.5rem;
+}
+.zone-form input {
+  flex: 1;
+}
+.zone-form .btn-primary {
+  width: auto;
+  white-space: nowrap;
+}
+.karte-status {
+  padding: 0 1.5rem;
+}
+
+.fund-speichern {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.fund-speichern .btn-secondary {
+  width: 100%;
+}
+
+/* Leaflet-Controls dezent an den Stil anpassen */
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  border-radius: 0 !important;
+  color: var(--ink);
+}
+.leaflet-popup-content {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
 /* ── Installations-Banner (PWA) ─────────────────────────────────────── */
 body.has-install-banner .footer {
   padding-bottom: 6rem;

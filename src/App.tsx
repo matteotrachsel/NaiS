@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { CameraInput } from '@/components/CameraInput';
 import { ElevationInput } from '@/components/ElevationInput';
 import { InstallBanner } from '@/components/InstallBanner';
+import { Karte } from '@/components/Karte';
 import { PflanzenAuswahl } from '@/components/PflanzenAuswahl';
 import { ResultCard } from '@/components/ResultCard';
 import { werteAusMehrere } from '@/services/naisService';
 import type { AuswertungErgebnis } from '@/types/nais';
 
+type Ansicht = 'bestimmen' | 'karte';
+
 export default function App() {
+  const [ansicht, setAnsicht] = useState<Ansicht>('bestimmen');
   const [pflanzenIds, setPflanzenIds] = useState<string[]>([]);
   const [hoeheM, setHoeheM] = useState<number | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
@@ -55,40 +59,61 @@ export default function App() {
         </div>
       </div>
 
-      <header className="masthead">
-        <p className="eyebrow">Waldstandort · standortgerechte Baumartenwahl</p>
-        <h1>Baumartenwahl nach NaiS</h1>
-        <p className="lead">
-          Zeigerpflanzen und Höhe über Meer bestimmen den Waldstandortstyp und damit
-          die geeigneten Baumarten. Suche und Auswertung funktionieren offline; die
-          Foto-Erkennung läuft online über PlantNet.
-        </p>
-      </header>
+      <nav className="tabs" aria-label="Ansicht wählen">
+        <button
+          className={ansicht === 'bestimmen' ? 'tab aktiv' : 'tab'}
+          onClick={() => setAnsicht('bestimmen')}
+        >
+          Bestimmen
+        </button>
+        <button
+          className={ansicht === 'karte' ? 'tab aktiv' : 'tab'}
+          onClick={() => setAnsicht('karte')}
+        >
+          Karte
+        </button>
+      </nav>
 
-      <main>
-        <CameraInput
-          onErkannt={handleErkannt}
-          online={online}
-          bereitsGewaehlt={pflanzenIds}
-        />
+      {ansicht === 'bestimmen' ? (
+        <>
+          <header className="masthead">
+            <p className="eyebrow">Waldstandort · standortgerechte Baumartenwahl</p>
+            <h1>Baumartenwahl nach NaiS</h1>
+            <p className="lead">
+              Zeigerpflanzen und Höhe über Meer bestimmen den Waldstandortstyp und
+              damit die geeigneten Baumarten. Suche und Auswertung funktionieren
+              offline; die Foto-Erkennung läuft online über PlantNet.
+            </p>
+          </header>
 
-        <PflanzenAuswahl selectedIds={pflanzenIds} onChange={setPflanzenIds} />
+          <main>
+            <CameraInput
+              onErkannt={handleErkannt}
+              online={online}
+              bereitsGewaehlt={pflanzenIds}
+            />
 
-        <ElevationInput hoeheM={hoeheM} onChange={setHoeheM} />
+            <PflanzenAuswahl selectedIds={pflanzenIds} onChange={setPflanzenIds} />
 
-        <ResultCard ergebnis={ergebnis} />
-      </main>
+            <ElevationInput hoeheM={hoeheM} onChange={setHoeheM} />
+
+            <ResultCard ergebnis={ergebnis} />
+          </main>
+
+          <footer className="footer">
+            <p className="footer-line">
+              NaiS Baumartenwahl · lokale Datenbasis · ohne Serververbindung nutzbar
+            </p>
+            <p className="footer-meta">
+              Entscheidungshilfe – ersetzt keine standortkundliche Beurteilung im Feld.
+            </p>
+          </footer>
+        </>
+      ) : (
+        <Karte online={online} />
+      )}
 
       <InstallBanner />
-
-      <footer className="footer">
-        <p className="footer-line">
-          NaiS Baumartenwahl · lokale Datenbasis · ohne Serververbindung nutzbar
-        </p>
-        <p className="footer-meta">
-          Entscheidungshilfe – ersetzt keine standortkundliche Beurteilung im Feld.
-        </p>
-      </footer>
     </div>
   );
 }
