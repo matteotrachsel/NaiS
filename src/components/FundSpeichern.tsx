@@ -60,7 +60,7 @@ export function FundSpeichern({ ergebnis }: Props) {
       // Schreibvorgang mit Timeout absichern, damit die UI nie endlos hängt.
       await mitTimeout(
         speichereBeobachtung(beobachtung),
-        20_000,
+        30_000,
         'Zeitüberschreitung beim Speichern – Internetverbindung prüfen und erneut versuchen.',
       );
       setStatus('fertig');

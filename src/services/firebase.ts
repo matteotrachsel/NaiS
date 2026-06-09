@@ -30,9 +30,10 @@ export function getDb(): Firestore {
   }
   if (!db) {
     app = initializeApp(cfg as Record<string, string>);
-    // Long-Polling automatisch erkennen -> robuster in Mobilfunk-/Proxy-Netzen,
-    // in denen der WebChannel-Transport sonst hängen bleiben kann.
-    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+    // Long-Polling ERZWINGEN: der WebChannel-/Streaming-Transport wird in
+    // vielen Mobilfunk-/Proxy-Netzen blockiert und bleibt dann hängen. Plain
+    // HTTP-Long-Polling ist deutlich kompatibler (auch im Node-Test nötig).
+    db = initializeFirestore(app, { experimentalForceLongPolling: true });
   }
   return db;
 }
