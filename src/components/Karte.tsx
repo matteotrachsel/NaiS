@@ -101,6 +101,7 @@ export function Karte({ online }: Props) {
 
   const [rasterAn, setRasterAn] = useState(false);
   const [aktiveLayer, setAktiveLayer] = useState<string[]>([]);
+  const [legendeOffen, setLegendeOffen] = useState(true);
   const [zeichnen, setZeichnen] = useState(false);
 
   const toggleLayer = (id: string) =>
@@ -372,22 +373,34 @@ export function Karte({ online }: Props) {
         <MapLegende />
 
         {aktiveLayer.length > 0 && (
-          <div className="bafu-legenden">
-            {BAFU_LAYERS.filter((l) => aktiveLayer.includes(l.id)).map((l) => (
-              <div key={l.id} className="bafu-legende">
-                <strong>{l.titel}</strong>
-                <p>{l.info}</p>
-                <img src={l.legende} alt={`Legende ${l.titel}`} />
-              </div>
-            ))}
-            <a
-              className="bafu-quelle"
-              href="https://www.gebirgswald.ch/de/nais-download.html"
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className={`bafu-legenden ${legendeOffen ? '' : 'zu'}`}>
+            <button
+              className="bafu-legende-toggle"
+              onClick={() => setLegendeOffen((o) => !o)}
+              aria-expanded={legendeOffen}
             >
-              Details zu NaiS ↗
-            </a>
+              <span>Legende</span>
+              <span aria-hidden="true">{legendeOffen ? '▾' : '▸'}</span>
+            </button>
+            {legendeOffen && (
+              <div className="bafu-legenden-inhalt">
+                {BAFU_LAYERS.filter((l) => aktiveLayer.includes(l.id)).map((l) => (
+                  <div key={l.id} className="bafu-legende">
+                    <strong>{l.titel}</strong>
+                    <p>{l.info}</p>
+                    <img src={l.legende} alt={`Legende ${l.titel}`} />
+                  </div>
+                ))}
+                <a
+                  className="bafu-quelle"
+                  href="https://www.gebirgswald.ch/de/nais-download.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Details zu NaiS ↗
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
