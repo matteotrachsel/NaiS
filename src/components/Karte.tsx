@@ -32,11 +32,35 @@ import { MapLegende } from '@/components/MapLegende';
 
 const CH_MITTE: [number, number] = [46.8, 8.23];
 
-/** BAFU-Layer „Waldstandortsregionen" (geo.admin.ch, WMTS). */
-const BAFU_REGIONEN_URL =
-  'https://wmts.geo.admin.ch/1.0.0/ch.bafu.wald-standortsregionen/default/current/3857/{z}/{x}/{y}.png';
-const BAFU_REGIONEN_LEGENDE =
-  'https://api3.geo.admin.ch/static/images/legends/ch.bafu.wald-standortsregionen_de.png';
+/** Umschaltbare BAFU-Overlays (geo.admin.ch, WMTS). */
+interface BafuLayer {
+  id: string;
+  name: string; // Toolbar-Label
+  titel: string; // Legenden-Titel
+  url: string;
+  legende: string;
+  info: string;
+}
+const BAFU_LAYERS: BafuLayer[] = [
+  {
+    id: 'ch.bafu.wald-standortsregionen',
+    name: 'Standortregionen',
+    titel: 'Waldstandortsregionen (BAFU)',
+    url: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.wald-standortsregionen/default/current/3857/{z}/{x}/{y}.png',
+    legende:
+      'https://api3.geo.admin.ch/static/images/legends/ch.bafu.wald-standortsregionen_de.png',
+    info: 'Regionen nach Klima, Waldvegetation und Höhenstufen (Frehner et al. 2005). Keine Buche in «Nördliche Zwischenalpen ohne Buche», «Kontinentale Hochalpen» und «Südliche Zwischenalpen».',
+  },
+  {
+    id: 'ch.bafu.wald-vegetationshoehenstufen_1975',
+    name: 'Höhenstufen',
+    titel: 'Vegetationshöhenstufen (BAFU)',
+    url: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.wald-vegetationshoehenstufen_1975/default/current/3857/{z}/{x}/{y}.png',
+    legende:
+      'https://api3.geo.admin.ch/static/images/legends/ch.bafu.wald-vegetationshoehenstufen_1975_de.png',
+    info: 'Vegetationshöhenstufen von kollin bis alpin (Frehner et al. 2005).',
+  },
+];
 
 interface Props {
   online: boolean;
@@ -76,8 +100,13 @@ export function Karte({ online }: Props) {
   const [fehler, setFehler] = useState<string | null>(null);
 
   const [rasterAn, setRasterAn] = useState(false);
-  const [regionenAn, setRegionenAn] = useState(false);
+  const [aktiveLayer, setAktiveLayer] = useState<string[]>([]);
   const [zeichnen, setZeichnen] = useState(false);
+
+  const toggleLayer = (id: string) =>
+    setAktiveLayer((cur) =>
+      cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id],
+    );
   const [entwurf, setEntwurf] = useState<ZonePunkt[]>([]);
   const [zoneName, setZoneName] = useState('');
   const [speichereZ, setSpeichereZ] = useState(false);
@@ -191,13 +220,16 @@ export function Karte({ online }: Props) {
         >
           ▦ Raster
         </button>
-        <button
-          className={regionenAn ? 'tool aktiv' : 'tool'}
-          onClick={() => setRegionenAn((v) => !v)}
-          title="Waldstandortsregionen (BAFU) ein-/ausblenden"
-        >
-          🗺 Standortregionen
-        </button>
+        {BAFU_LAYERS.map((l) => (
+          <button
+            key={l.id}
+            className={aktiveLayer.includes(l.id) ? 'tool aktiv' : 'tool'}
+            onClick={() => toggleLayer(l.id)}
+            title={`${l.titel} ein-/ausblenden`}
+          >
+            🗺 {l.name}
+          </button>
+        ))}
         {zeichnen ? (
           <>
             <button className="tool" onClick={abbrechen}>
@@ -224,15 +256,16 @@ export function Karte({ online }: Props) {
             maxZoom={18}
           />
 
-          {/* BAFU-Overlay „Waldstandortsregionen" (über Basiskarte, unter Markern) */}
-          {regionenAn && (
+          {/* BAFU-Overlays (über Basiskarte, unter Markern) */}
+          {BAFU_LAYERS.filter((l) => aktiveLayer.includes(l.id)).map((l) => (
             <TileLayer
-              url={BAFU_REGIONEN_URL}
+              key={l.id}
+              url={l.url}
               opacity={0.6}
               maxZoom={18}
-              attribution='Waldstandortsregionen &copy; <a href="https://www.bafu.admin.ch">BAFU</a>'
+              attribution={`${l.titel} &copy; <a href="https://www.bafu.admin.ch">BAFU</a>`}
             />
-          )}
+          ))}
 
           {!zeichnen && <FitBounds punkte={beobachtungen} />}
 
@@ -338,17 +371,17 @@ export function Karte({ online }: Props) {
 
         <MapLegende />
 
-        {regionenAn && (
-          <div className="regionen-legende">
-            <strong>Waldstandortsregionen (BAFU)</strong>
-            <p>
-              Regionen nach klimatischen Faktoren, Waldvegetation und Höhenstufen
-              (Frehner et al. 2005). Keine Buche in den Regionen «Nördliche
-              Zwischenalpen ohne Buche», «Kontinentale Hochalpen» und «Südliche
-              Zwischenalpen».
-            </p>
-            <img src={BAFU_REGIONEN_LEGENDE} alt="Legende Waldstandortsregionen" />
+        {aktiveLayer.length > 0 && (
+          <div className="bafu-legenden">
+            {BAFU_LAYERS.filter((l) => aktiveLayer.includes(l.id)).map((l) => (
+              <div key={l.id} className="bafu-legende">
+                <strong>{l.titel}</strong>
+                <p>{l.info}</p>
+                <img src={l.legende} alt={`Legende ${l.titel}`} />
+              </div>
+            ))}
             <a
+              className="bafu-quelle"
               href="https://www.gebirgswald.ch/de/nais-download.html"
               target="_blank"
               rel="noopener noreferrer"

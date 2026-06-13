@@ -718,13 +718,13 @@ input:focus,
   border: 1px solid #1a1a1a;
 }
 
-.regionen-legende {
+.bafu-legenden {
   position: absolute;
   z-index: 500;
   left: 0.6rem;
   bottom: 0.6rem;
-  width: 230px;
-  max-height: 60%;
+  width: 232px;
+  max-height: 72%;
   overflow-y: auto;
   padding: 0.6rem 0.7rem;
   background: rgba(255, 255, 255, 0.95);
@@ -732,25 +732,27 @@ input:focus,
   font-size: 0.74rem;
   line-height: 1.4;
 }
-.regionen-legende strong {
+.bafu-legende {
+  margin-bottom: 0.7rem;
+}
+.bafu-legende strong {
   display: block;
   font-size: 0.78rem;
   margin-bottom: 0.3rem;
 }
-.regionen-legende p {
+.bafu-legende p {
   margin: 0 0 0.5rem;
   color: var(--muted);
 }
-.regionen-legende img {
+.bafu-legende img {
   width: 100%;
   height: auto;
   display: block;
   border: 1px solid var(--line);
   background: #fff;
 }
-.regionen-legende a {
+.bafu-quelle {
   display: inline-block;
-  margin-top: 0.4rem;
   color: var(--red);
   font-weight: 600;
   text-decoration: none;
