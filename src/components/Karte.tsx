@@ -32,6 +32,12 @@ import { MapLegende } from '@/components/MapLegende';
 
 const CH_MITTE: [number, number] = [46.8, 8.23];
 
+/** BAFU-Layer „Waldstandortsregionen" (geo.admin.ch, WMTS). */
+const BAFU_REGIONEN_URL =
+  'https://wmts.geo.admin.ch/1.0.0/ch.bafu.wald-standortsregionen/default/current/3857/{z}/{x}/{y}.png';
+const BAFU_REGIONEN_LEGENDE =
+  'https://api3.geo.admin.ch/static/images/legends/ch.bafu.wald-standortsregionen_de.png';
+
 interface Props {
   online: boolean;
 }
@@ -70,6 +76,7 @@ export function Karte({ online }: Props) {
   const [fehler, setFehler] = useState<string | null>(null);
 
   const [rasterAn, setRasterAn] = useState(false);
+  const [regionenAn, setRegionenAn] = useState(false);
   const [zeichnen, setZeichnen] = useState(false);
   const [entwurf, setEntwurf] = useState<ZonePunkt[]>([]);
   const [zoneName, setZoneName] = useState('');
@@ -184,6 +191,13 @@ export function Karte({ online }: Props) {
         >
           ▦ Raster
         </button>
+        <button
+          className={regionenAn ? 'tool aktiv' : 'tool'}
+          onClick={() => setRegionenAn((v) => !v)}
+          title="Waldstandortsregionen (BAFU) ein-/ausblenden"
+        >
+          🗺 Standortregionen
+        </button>
         {zeichnen ? (
           <>
             <button className="tool" onClick={abbrechen}>
@@ -209,6 +223,16 @@ export function Karte({ online }: Props) {
             attribution='&copy; <a href="https://www.swisstopo.admin.ch">swisstopo</a>'
             maxZoom={18}
           />
+
+          {/* BAFU-Overlay „Waldstandortsregionen" (über Basiskarte, unter Markern) */}
+          {regionenAn && (
+            <TileLayer
+              url={BAFU_REGIONEN_URL}
+              opacity={0.6}
+              maxZoom={18}
+              attribution='Waldstandortsregionen &copy; <a href="https://www.bafu.admin.ch">BAFU</a>'
+            />
+          )}
 
           {!zeichnen && <FitBounds punkte={beobachtungen} />}
 
@@ -313,6 +337,26 @@ export function Karte({ online }: Props) {
         </MapContainer>
 
         <MapLegende />
+
+        {regionenAn && (
+          <div className="regionen-legende">
+            <strong>Waldstandortsregionen (BAFU)</strong>
+            <p>
+              Regionen nach klimatischen Faktoren, Waldvegetation und Höhenstufen
+              (Frehner et al. 2005). Keine Buche in den Regionen «Nördliche
+              Zwischenalpen ohne Buche», «Kontinentale Hochalpen» und «Südliche
+              Zwischenalpen».
+            </p>
+            <img src={BAFU_REGIONEN_LEGENDE} alt="Legende Waldstandortsregionen" />
+            <a
+              href="https://www.gebirgswald.ch/de/nais-download.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Details zu NaiS ↗
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Panel zum Abschliessen einer Zone */}
